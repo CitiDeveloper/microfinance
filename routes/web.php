@@ -12,8 +12,10 @@ use App\Http\Controllers\{
     CollateralController,
     CalendarController,
     CollectionSheetController,
+    GuarantorController,
     SavingController,
     SavingTransactionController,
+    BankAccountController,
     InvestorController,
     PayrollController,
     ExpenseController,
@@ -63,15 +65,15 @@ Route::middleware(['auth'])->group(function () {
 
     // Loan Products 
 
-Route::prefix('loan-products')->group(function () {
-    Route::get('/', [LoanProductController::class, 'index'])->name('loan-products.index');
-    Route::get('/create', [LoanProductController::class, 'create'])->name('loan-products.create');
-    Route::post('/', [LoanProductController::class, 'store'])->name('loan-products.store');
-    Route::get('/{loanProduct}', [LoanProductController::class, 'show'])->name('loan-products.show');
-    Route::get('/{loanProduct}/edit', [LoanProductController::class, 'edit'])->name('loan-products.edit');
-    Route::put('/{loanProduct}', [LoanProductController::class, 'update'])->name('loan-products.update');
-    Route::delete('/{loanProduct}', [LoanProductController::class, 'destroy'])->name('loan-products.destroy');
-});
+    Route::prefix('loan-products')->group(function () {
+        Route::get('/', [LoanProductController::class, 'index'])->name('loan-products.index');
+        Route::get('/create', [LoanProductController::class, 'create'])->name('loan-products.create');
+        Route::post('/', [LoanProductController::class, 'store'])->name('loan-products.store');
+        Route::get('/{loanProduct}', [LoanProductController::class, 'show'])->name('loan-products.show');
+        Route::get('/{loanProduct}/edit', [LoanProductController::class, 'edit'])->name('loan-products.edit');
+        Route::put('/{loanProduct}', [LoanProductController::class, 'update'])->name('loan-products.update');
+        Route::delete('/{loanProduct}', [LoanProductController::class, 'destroy'])->name('loan-products.destroy');
+    });
 
     // Borrowers
     Route::prefix('borrowers')->group(function () {
@@ -239,7 +241,8 @@ Route::prefix('loan-products')->group(function () {
         Route::get('/performance', [ReportController::class, 'performance'])->name('reports.performance');
         Route::post('/export/{type}', [ReportController::class, 'export'])->name('reports.export');
     });
-
+    Route::resource('bank_accounts', BankAccountController::class);
+    Route::resource('guarantors', GuarantorController::class);
     // Accounting
     Route::prefix('accounting')->group(function () {
         Route::get('/chart-of-accounts', [AccountingController::class, 'chartOfAccounts'])->name('accounting.chart-of-accounts');

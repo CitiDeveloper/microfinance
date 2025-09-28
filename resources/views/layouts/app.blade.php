@@ -116,7 +116,7 @@
 						<div class="menu-img online">
 							<img src="assets/img/user/user.jpg" alt="" class="ms-100 mh-100 rounded-circle">
 						</div>
-						<div class="menu-text">{{ucfirst(Auth::user()->name)}}</div>
+						{{-- <div class="menu-text">{{ucfirst(Auth::user()->name)}}</div> --}}
 					</a>
 					<div class="dropdown-menu dropdown-menu-end me-lg-3">
 						<a class="dropdown-item d-flex align-items-center" href="profile.html">Edit Profile <i class="fa fa-user-circle fa-fw ms-auto text-body text-opacity-50"></i></a>
