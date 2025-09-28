@@ -140,8 +140,8 @@
                             <div class="progress-bar bg-success" style="width: 65%"></div>
                         </div>
                         <div class="d-flex justify-content-between mt-1">
-                            <small class="text-muted">Paid: ₱15,250.00</small>
-                            <small class="text-muted">Remaining: ₱8,250.00</small>
+                            <small class="text-muted">Paid: 15,250.00</small>
+                            <small class="text-muted">Remaining: 8,250.00</small>
                         </div>
                     </div>
                 </div>
@@ -173,9 +173,9 @@
                                     <tr>
                                         <td class="font-weight-bold">{{ $repayment->receipt_number ?? 'N/A' }}</td>
                                         <td>{{ $repayment->payment_date ? $repayment->payment_date->format('M d, Y') : 'N/A' }}</td>
-                                        <td>${{ number_format($repayment->amount, 2) }}</td>
-                                        <td>${{ number_format($repayment->principal_paid, 2) }}</td>
-                                        <td>${{ number_format($repayment->interest_paid, 2) }}</td>
+                                        <td>{{ number_format($repayment->amount, 2) }}</td>
+                                        <td>{{ number_format($repayment->principal_paid, 2) }}</td>
+                                        <td>{{ number_format($repayment->interest_paid, 2) }}</td>
                                         <td>
                                             @php
                                                 $statusClass = [
@@ -190,9 +190,9 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-primary">
+                                            <a href="{{ route('repayments.show', $repayment) }}" class="btn btn-sm btn-outline-primary"> 
                                                 <i class="fas fa-eye"></i> View
-                                            </button>
+                                            </a>
                                         </td>
                                     </tr>
                                     @endforeach
@@ -233,7 +233,7 @@
                                     <tr>
                                         <td class="font-weight-bold">{{ $collateral->collateral_type }}</td>
                                         <td>{{ Str::limit($collateral->description, 50) }}</td>
-                                        <td>${{ number_format($collateral->estimated_value, 2) }}</td>
+                                        <td>{{ number_format($collateral->estimated_value, 2) }}</td>
                                         <td>{{ $collateral->condition ?? 'N/A' }}</td>
                                         <td>
                                             @php
@@ -249,9 +249,9 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-primary">
+                                            <a href="{{ route('collateral.show', $collateral) }}" class="btn btn-sm btn-outline-primary">
                                                 <i class="fas fa-eye"></i> View
-                                            </button>
+                                            </a>
                                         </td>
                                     </tr>
                                     @endforeach
@@ -347,20 +347,18 @@
                     <h6 class="mb-0 text-primary"><i class="fas fa-bolt mr-2"></i>Quick Actions</h6>
                 </div>
                 <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-success btn-sm">
+                      <button class="btn btn-outline-success btn-sm mb-2">
                             <i class="fas fa-cash-register mr-1"></i>Record Payment
                         </button>
-                        <button class="btn btn-warning btn-sm">
+                        <button class="btn btn-outline-warning btn-sm mb-2">
                             <i class="fas fa-history mr-1"></i>Payment History
                         </button>
-                        <button class="btn btn-info btn-sm">
+                        <button class="btn btn-outline-info btn-sm mb-2">
                             <i class="fas fa-chart-bar mr-1"></i>Generate Report
                         </button>
-                        <button class="btn btn-outline-primary btn-sm">
+                        <button class="btn btn-outline-primary btn-sm mb-2">
                             <i class="fas fa-bell mr-1"></i>Schedule Reminder
                         </button>
-                    </div>
                 </div>
             </div>
 

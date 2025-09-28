@@ -75,11 +75,11 @@
                     <div class="card shadow-sm border-0  bg-opacity-10">
                         <div class="card-header bg-transparent border-bottom py-3">
                             <h6 class="mb-0 fw-semibold text-primary">
-                                <i class="fas fa-dollar-sign me-2"></i>Total Amount
+                                Total Amount
                             </h6>
                         </div>
                         <div class="card-body text-center py-4">
-                            <h2 class="text-success fw-bold mb-0">${{ number_format($repayment->amount, 2) }}</h2>
+                            <h2 class="text-success fw-bold mb-0">Ksh. {{ number_format($repayment->amount, 2) }}</h2>
                             <p class="text-muted small mb-0">Total Payment Received</p>
                         </div>
                     </div>
@@ -100,27 +100,27 @@
                             <div class="vstack gap-3">
                                 <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                                     <span class="text-muted">Principal Paid</span>
-                                    <span class="fw-semibold">${{ number_format($repayment->principal_paid, 2) }}</span>
+                                    <span class="fw-semibold">Ksh. {{ number_format($repayment->principal_paid, 2) }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                                     <span class="text-muted">Interest Paid</span>
-                                    <span class="fw-semibold">${{ number_format($repayment->interest_paid, 2) }}</span>
+                                    <span class="fw-semibold">Ksh. {{ number_format($repayment->interest_paid, 2) }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                                     <span class="text-muted">Fees Paid</span>
-                                    <span class="fw-semibold">${{ number_format($repayment->fees_paid, 2) }}</span>
+                                    <span class="fw-semibold">Ksh. {{ number_format($repayment->fees_paid, 2) }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                                     <span class="text-muted">Penalty Paid</span>
-                                    <span class="fw-semibold">${{ number_format($repayment->penalty_paid, 2) }}</span>
+                                    <span class="fw-semibold">Ksh. {{ number_format($repayment->penalty_paid, 2) }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                                     <span class="text-muted text-danger">Waiver Amount</span>
-                                    <span class="fw-semibold text-danger">-${{ number_format($repayment->waiver_amount, 2) }}</span>
+                                    <span class="fw-semibold text-danger">-Ksh. {{ number_format($repayment->waiver_amount, 2) }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center py-2 pt-3 border-top">
                                     <span class="fw-semibold text-primary">Total Allocated</span>
-                                    <span class="fw-bold text-primary">${{ number_format($repayment->total_allocated, 2) }}</span>
+                                    <span class="fw-bold text-primary">Ksh. {{ number_format($repayment->total_allocated, 2) }}</span>
                                 </div>
                             </div>
                         </div>
@@ -154,7 +154,7 @@
                                 @if($repayment->outstanding_balance)
                                 <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                                     <span class="text-muted">Outstanding Balance</span>
-                                    <span class="fw-semibold">${{ number_format($repayment->outstanding_balance, 2) }}</span>
+                                    <span class="fw-semibold">Ksh. {{ number_format($repayment->outstanding_balance, 2) }}</span>
                                 </div>
                                 @endif
                             </div>
@@ -180,7 +180,7 @@
                                             <i class="fas fa-user fa-lg text-primary"></i>
                                         </div>
                                         <label class="form-label text-muted small mb-1">Borrower</label>
-                                        <p class="mb-0 fw-semibold">{{ $repayment->borrower->name ?? 'N/A' }}</p>
+                                        <p class="mb-0 fw-semibold">{{ $repayment->borrower->full_name ?? 'N/A' }}</p>
                                     </div>
                                 </div>
                                 <div class="col-md-3 text-center">
@@ -189,7 +189,7 @@
                                             <i class="fas fa-file-invoice-dollar fa-lg text-info"></i>
                                         </div>
                                         <label class="form-label text-muted small mb-1">Loan Number</label>
-                                        <p class="mb-0 fw-semibold">{{ $repayment->loan->loan_number ?? 'N/A' }}</p>
+                                        <p class="mb-0 fw-semibold">{{ $repayment->loan->loan_application_id ?? 'N/A' }}</p>
                                     </div>
                                 </div>
                                 <div class="col-md-3 text-center">
@@ -198,7 +198,7 @@
                                             <i class="fas fa-code-branch fa-lg text-warning"></i>
                                         </div>
                                         <label class="form-label text-muted small mb-1">Branch</label>
-                                        <p class="mb-0 fw-semibold">{{ $repayment->branch->name ?? 'N/A' }}</p>
+                                        <p class="mb-0 fw-semibold">{{ $repayment->branch->branch_name ?? 'N/A' }}</p>
                                     </div>
                                 </div>
                                 <div class="col-md-3 text-center">
@@ -207,7 +207,7 @@
                                             <i class="fas fa-user-tie fa-lg text-success"></i>
                                         </div>
                                         <label class="form-label text-muted small mb-1">Collected By</label>
-                                        <p class="mb-0 fw-semibold">{{ $repayment->collector->name ?? 'N/A' }}</p>
+                                        <p class="mb-0 fw-semibold">{{ $repayment->collector->full_name ?? 'N/A' }}</p>
                                     </div>
                                 </div>
                             </div>
