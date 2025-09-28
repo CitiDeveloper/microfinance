@@ -92,10 +92,17 @@ class LoanProduct extends Model
     ];
 
     // Relationships
+    
     public function branches()
     {
-        return $this->belongsToMany(Branch::class, 'branch_loan_product');
+        return $this->belongsToMany(
+            Branch::class,
+            'branch_loan_product',   // pivot table name
+            'loan_product_id',       // foreign key on pivot table pointing to LoanProduct
+            'branch_id'              // foreign key on pivot table pointing to Branch
+        );
     }
+
 
     public function loans()
     {
@@ -105,5 +112,10 @@ class LoanProduct extends Model
     public function loanStatus()
     {
         return $this->belongsTo(LoanStatus::class);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 }

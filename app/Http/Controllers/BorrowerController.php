@@ -48,6 +48,13 @@ class BorrowerController extends Controller
 
     public function show(Borrower $borrower): View
     {
+        // Eager load the loans relationship with related data
+        $borrower->load([
+            'loans.loanStatus',
+            'loans.loanProduct',
+            'loans.branch'
+        ]);
+
         return view('borrowers.show', compact('borrower'));
     }
 

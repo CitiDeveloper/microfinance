@@ -87,4 +87,13 @@ class Borrower extends Model
             ->orWhere('mobile', 'like', "%{$search}%")
             ->orWhere('email', 'like', "%{$search}%");
     }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
+    public function loans()
+    {
+        return $this->hasMany(Loan::class);
+    }
 }

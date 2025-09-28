@@ -24,7 +24,7 @@
                                     <option value="">-- Select Loan Product --</option>
                                     @foreach($loanProducts as $product)
                                         <option value="{{ $product->id }}" {{ old('loan_product_id') == $product->id ? 'selected' : '' }}>
-                                            {{ $product->name }}
+                                            {{ $product->loan_product_name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -36,7 +36,7 @@
                                     <option value="">-- Select Borrower --</option>
                                     @foreach($borrowers as $borrower)
                                         <option value="{{ $borrower->id }}" {{ old('borrower_id') == $borrower->id ? 'selected' : '' }}>
-                                            {{ $borrower->name }} - {{ $borrower->member_id }}
+                                            {{ $borrower->full_name }} - {{ $borrower->member_id }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -58,7 +58,7 @@
                                     <option value="">-- Select Branch --</option>
                                     @foreach($branches as $branch)
                                         <option value="{{ $branch->id }}" {{ old('branch_id') == $branch->id ? 'selected' : '' }}>
-                                            {{ $branch->name }}
+                                            {{ $branch->branch_name }}
                                         </option>
                                     @endforeach
                                 </select>

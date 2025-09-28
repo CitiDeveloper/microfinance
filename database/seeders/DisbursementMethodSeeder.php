@@ -21,3 +21,4 @@ class DisbursementMethodSeeder extends Seeder
         }
     }
 }
+

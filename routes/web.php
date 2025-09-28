@@ -62,7 +62,6 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{staff}', [StaffController::class, 'update'])->name('staff.update');
         Route::delete('/{staff}', [StaffController::class, 'destroy'])->name('staff.destroy');
     });
-
     // Loan Products 
 
     Route::prefix('loan-products')->group(function () {

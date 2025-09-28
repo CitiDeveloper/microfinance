@@ -13,7 +13,7 @@ class LoanProductController extends Controller
 {
     public function index()
     {
-        $loanProducts = LoanProduct::with('branches')->latest()->get();
+        $loanProducts = LoanProduct::with('branches')->latest()->paginate(10);
         return view('loan-products.index', compact('loanProducts'));
     }
 

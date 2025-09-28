@@ -46,8 +46,10 @@ class Branch extends Model
     // Relationships
     public function staff()
     {
-        return $this->hasMany(Staff::class);
+        return $this->belongsToMany(Staff::class, 'staff_branches')
+            ->withTimestamps();
     }
+
 
     public function borrowers()
     {
@@ -66,8 +68,14 @@ class Branch extends Model
 
     public function loanProducts()
     {
-        return $this->belongsToMany(LoanProduct::class, 'branch_loan_products');
+        return $this->belongsToMany(
+            LoanProduct::class,
+            'branch_loan_product',   // match the table
+            'branch_id',
+            'loan_product_id'
+        );
     }
+
 
     public function loanOfficers()
     {

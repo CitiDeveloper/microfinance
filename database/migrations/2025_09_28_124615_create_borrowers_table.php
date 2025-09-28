@@ -12,6 +12,7 @@ class CreateBorrowersTable extends Migration
         Schema::create('borrowers', function (Blueprint $table) {
             $table->id();
             $table->string('county')->nullable();
+            $table->foreignId('branch_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('first_name')->nullable();
             $table->string('last_name')->nullable();
             $table->string('business_name')->nullable();
@@ -33,7 +34,6 @@ class CreateBorrowersTable extends Migration
                 'Owner',
                 'Student',
                 'Business Person',
-                'Pensioner',
                 'Pensioner',
                 'Unemployed'
             ])->nullable();

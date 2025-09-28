@@ -12,17 +12,18 @@ class BranchController extends Controller
 {
     public function index()
     {
-        $branches = Branch::withCount(['staff', 'borrowers', 'loans'])->get();
+        $branches = Branch::withCount(['staff', 'borrowers', 'loans'])->paginate(10);
         return view('branches.index', compact('branches'));
     }
 
     public function create()
     {
         $loanProducts = LoanProduct::active()->get();
-        $staff = Staff::active()->get();
+        $staff = Staff::get();
 
         return view('branches.create', compact('loanProducts', 'staff'));
     }
+
 
     public function store(Request $request)
     {

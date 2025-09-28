@@ -47,25 +47,23 @@ return new class extends Migration
             $table->softDeletes();
         });
 
-        // Create branch relationships tables
-        Schema::create('branch_loan_products', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('branch_id')->constrained()->onDelete('cascade');
-            $table->foreignId('loan_product_id')->constrained()->onDelete('cascade');
-            $table->timestamps();
-        });
-
         Schema::create('branch_loan_officers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('branch_id')->constrained()->onDelete('cascade');
-            $table->foreignId('staff_id')->constrained()->onDelete('cascade');
+            $table->foreignId('staff_id')->constrained('staff')->onDelete('cascade');
             $table->timestamps();
         });
 
         Schema::create('branch_collectors', function (Blueprint $table) {
             $table->id();
             $table->foreignId('branch_id')->constrained()->onDelete('cascade');
+            $table->foreignId('staff_id')->constrained('staff')->onDelete('cascade');
+            $table->timestamps();
+        });
+        Schema::create('staff_branches', function (Blueprint $table) {
+            $table->id();
             $table->foreignId('staff_id')->constrained()->onDelete('cascade');
+            $table->foreignId('branch_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -74,7 +72,7 @@ return new class extends Migration
     {
         Schema::dropIfExists('branch_collectors');
         Schema::dropIfExists('branch_loan_officers');
-        Schema::dropIfExists('branch_loan_products');
+        Schema::dropIfExists('staff_branches');
         Schema::dropIfExists('branches');
     }
 };
