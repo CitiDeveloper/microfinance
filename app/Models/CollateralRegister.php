@@ -73,7 +73,7 @@ class CollateralRegister extends Model
      */
     public function getFormattedEstimatedValueAttribute()
     {
-        return '₦' . number_format($this->estimated_value, 2);
+        return 'Ksh ' . number_format($this->estimated_value, 2);
     }
 
     /**

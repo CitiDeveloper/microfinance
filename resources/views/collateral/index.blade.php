@@ -125,7 +125,7 @@
                                         'sold' => 'bg-warning'
                                     ];
                                 @endphp
-                                <span class="status-badge {{ $statusColors[$collateral->status] ?? 'bg-secondary' }}">
+                                <span class="badge  {{ $statusColors[$collateral->status] ?? 'bg-secondary' }}">
                                     {{ ucfirst($collateral->status) }}
                                 </span>
                             </td>
@@ -178,7 +178,7 @@
                     of {{ $collaterals->total() }} entries
                 </div>
                 <nav>
-                    {{ $collaterals->links() }}
+                     {{ $collaterals->links('pagination::bootstrap-4') }}
                 </nav>
             </div>
             @endif
