@@ -135,6 +135,7 @@
 		
 		<!-- BEGIN #content -->
 		<div id="content" class="app-content">
+			@include('partials.messages')
 			@yield('content')
 		</div>
 		<!-- END #content -->

@@ -1,50 +1,9 @@
+{{-- resources/views/loans/show.blade.php --}}
+@extends('layouts.app')
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loan Details | Microfinance Dashboard</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <style>
-        :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --success-color: #27ae60;
-            --warning-color: #f39c12;
-            --danger-color: #e74c3c;
-            --info-color: #17a2b8;
-            --light-bg: #f8f9fa;
-            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --card-radius: 12px;
-        }
-        
-        body {
-            background-color: #f5f7fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        .card {
-            border: none;
-            box-shadow: var(--card-shadow);
-            border-radius: var(--card-radius);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
-        
-        .card-header {
-            background: linear-gradient(135deg, var(--primary-color), #34495e);
-            color: white;
-            border-radius: var(--card-radius) var(--card-radius) 0 0 !important;
-            padding: 1rem 1.25rem;
-        }
+@section('title', 'Loan Details')
+<style>
+       
         
         .status-badge {
             font-size: 0.75rem;
@@ -148,9 +107,8 @@
             }
         }
     </style>
-</head>
-<body>
-    <div class="container-fluid py-4">
+@section('content')
+<div class="container-fluid py-4">
         <!-- Header Section -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
@@ -471,7 +429,4 @@
         </div>
     </div>
 
-    <!-- Bootstrap 5 JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+@endsection

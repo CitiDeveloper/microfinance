@@ -104,7 +104,7 @@
                                     <option value="">-- Select Officer --</option>
                                     @foreach($staff as $officer)
                                         <option value="{{ $officer->id }}" {{ old('staff_id') == $officer->id ? 'selected' : '' }}>
-                                            {{ $officer->name }}
+                                            {{ $officer->full_name }} 
                                         </option>
                                     @endforeach
                                 </select>
@@ -243,7 +243,7 @@
                                     <option value="">-- Select Account --</option>
                                     @foreach($bankAccounts as $account)
                                         <option value="{{ $account->id }}" {{ old('dea_cash_bank_account')==$account->id?'selected':'' }}>
-                                            {{ $account->name }} - {{ $account->account_number }}
+                                            {{ $account->coa_name }} - {{ $account->coa_code }}
                                         </option>
                                     @endforeach
                                 </select>

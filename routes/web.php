@@ -9,7 +9,7 @@ use App\Http\Controllers\{
     BorrowerController,
     LoanController,
     RepaymentController,
-    CollateralController,
+    CollateralRegisterController,
     CalendarController,
     CollectionSheetController,
     GuarantorController,
@@ -23,6 +23,7 @@ use App\Http\Controllers\{
     AssetController,
     ReportController,
     AccountingController,
+    
     SystemSettingController,
     ProfileController
 };
@@ -118,13 +119,13 @@ Route::middleware(['auth'])->group(function () {
 
     // Collateral Register
     Route::prefix('collateral')->group(function () {
-        Route::get('/', [CollateralController::class, 'index'])->name('collateral.index');
-        Route::get('/create', [CollateralController::class, 'create'])->name('collateral.create');
-        Route::post('/', [CollateralController::class, 'store'])->name('collateral.store');
-        Route::get('/{collateral}', [CollateralController::class, 'show'])->name('collateral.show');
-        Route::get('/{collateral}/edit', [CollateralController::class, 'edit'])->name('collateral.edit');
-        Route::put('/{collateral}', [CollateralController::class, 'update'])->name('collateral.update');
-        Route::delete('/{collateral}', [CollateralController::class, 'destroy'])->name('collateral.destroy');
+        Route::get('/', [CollateralRegisterController::class, 'index'])->name('collateral.index');
+        Route::get('/create', [CollateralRegisterController::class, 'create'])->name('collateral.create');
+        Route::post('/', [CollateralRegisterController::class, 'store'])->name('collateral.store');
+        Route::get('/{collateral}', [CollateralRegisterController::class, 'show'])->name('collateral.show');
+        Route::get('/{collateral}/edit', [CollateralRegisterController::class, 'edit'])->name('collateral.edit');
+        Route::put('/{collateral}', [CollateralRegisterController::class, 'update'])->name('collateral.update');
+        Route::delete('/{collateral}', [CollateralRegisterController::class, 'destroy'])->name('collateral.destroy');
     });
 
     // Calendar

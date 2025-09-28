@@ -52,6 +52,7 @@
                 <table class="table table-hover mb-0">
                     <thead class="table-light">
                         <tr>
+                            <th class="ps-4">#</th>
                             <th class="ps-4">Unique #</th>
                             <th>Name</th>
                             <th>Business</th>
@@ -62,8 +63,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($borrowers as $borrower)
+                        @forelse($borrowers as $key=> $borrower)
                         <tr class="align-middle">
+                            <td class="ps-4 fw-semibold text-primary">
+                                {{ $key+1 }}
+                            </td>
                             <td class="ps-4 fw-semibold text-primary">
                                 {{ $borrower->unique_number ?? 'N/A' }}
                             </td>

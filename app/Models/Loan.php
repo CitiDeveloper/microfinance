@@ -128,7 +128,7 @@ class Loan extends Model
 
     public function afterMaturityPaymentScheme()
     {
-        return $this->belongsTo(RepaymentCycle::class, 'after_maturity_recurring_period_payment_scheme_id');
+        return $this->belongsTo(RepaymentCycle::class, 'loan_payment_scheme_id');
     }
 
     public function guarantors()
@@ -143,7 +143,7 @@ class Loan extends Model
 
     public function collateral()
     {
-        return $this->hasMany(Collateral::class);
+        return $this->hasMany(CollateralRegister::class);
     }
 
     // Scopes

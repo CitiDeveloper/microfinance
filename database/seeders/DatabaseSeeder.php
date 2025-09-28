@@ -20,14 +20,20 @@ class DatabaseSeeder extends Seeder
 
         // Call your custom seeders
         $this->call([
+            // LoanProductSeeder::class,  
             // AfterMaturityInterestOptionSeeder::class,
-            // BorrowerSeeder::class,  
+            // BorrowerSeeder::class,
+            // BranchSeeder::class,
             // DisbursementMethodSeeder::class,
             // LoanPaymentSchemeSeeder::class,
             // LoanStatusSeeder::class,
             // RepaymentCycleSeeder::class,
-            //RoleSeeder::class,
-            StaffSeeder::class,
+            // RoleSeeder::class,
+            // StaffSeeder::class,
+            // BankAccountSeeder::class,
+            // LoanSeeder::class,
+            // PaymentMethodSeeder::class,
+            // CollateralRegisterSeeder::class,
         ]);
     }
 }
