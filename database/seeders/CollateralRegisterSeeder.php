@@ -44,7 +44,7 @@ class CollateralRegisterSeeder extends Seeder
 
         // Insert in chunks to avoid memory issues
         foreach (array_chunk($collaterals, 50) as $chunk) {
-            DB::table('collateral_register')->insert($chunk);
+            DB::table('collateral_registers')->insert($chunk);
         }
     }
 }

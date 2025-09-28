@@ -11,7 +11,7 @@ class CollateralRegister extends Model
 {
     use HasFactory;
 
-    protected $table = 'collateral_register';
+    protected $table = 'collateral_registers';
 
     protected $fillable = [
         'loan_id',

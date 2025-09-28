@@ -34,6 +34,7 @@ class DatabaseSeeder extends Seeder
             // LoanSeeder::class,
             // PaymentMethodSeeder::class,
             // CollateralRegisterSeeder::class,
+            //RepaymentsTableSeeder::class,
         ]);
     }
 }

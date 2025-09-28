@@ -141,7 +141,7 @@ class Loan extends Model
         return $this->hasMany(Repayment::class);
     }
 
-    public function collateral()
+    public function collaterals()
     {
         return $this->hasMany(CollateralRegister::class);
     }

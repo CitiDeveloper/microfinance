@@ -5,11 +5,11 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCollateralRegisterTable extends Migration
+class CreateCollateralRegistersTable extends Migration
 {
     public function up()
     {
-        Schema::create('collateral_register', function (Blueprint $table) {
+        Schema::create('collateral_registers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('loan_id')->constrained()->onDelete('cascade');
             $table->string('collateral_type');
@@ -34,6 +34,6 @@ class CreateCollateralRegisterTable extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('collateral_register');
+        Schema::dropIfExists('collateral_registers');
     }
 }

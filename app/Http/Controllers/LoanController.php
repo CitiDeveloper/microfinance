@@ -103,10 +103,12 @@ class LoanController extends Controller
             'cashBankAccount',
             'guarantors',
             'repayments',
-            'collateral'
+            'collaterals'
         ]);
+       
 
         return view('loans.show', compact('loan'));
+        
     }
 
     public function edit(Loan $loan)
