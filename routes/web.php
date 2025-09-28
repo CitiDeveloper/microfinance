@@ -263,6 +263,46 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [SystemSettingController::class, 'index'])->name('system-settings.index');
         Route::put('/', [SystemSettingController::class, 'update'])->name('system-settings.update');
         Route::post('/backup', [SystemSettingController::class, 'backup'])->name('system-settings.backup');
+
+        // Bank Accounts Routes
+        Route::prefix('bank-accounts')->group(function () {
+            Route::get('/', [SystemSettingController::class, 'bankAccounts'])->name('system-settings.bank-accounts');
+            Route::post('/store', [SystemSettingController::class, 'storeBankAccount'])->name('system-settings.bank-accounts.store');
+            Route::put('/{id}', [SystemSettingController::class, 'updateBankAccount'])->name('system-settings.bank-accounts.update');
+            Route::delete('/{id}', [SystemSettingController::class, 'destroyBankAccount'])->name('system-settings.bank-accounts.destroy');
+        });
+
+        // Repayment Cycles Routes
+        Route::prefix('repayment-cycles')->group(function () {
+            Route::get('/', [SystemSettingController::class, 'repaymentCycles'])->name('system-settings.repayment-cycles');
+            Route::post('/store', [SystemSettingController::class, 'storeRepaymentCycle'])->name('system-settings.repayment-cycles.store');
+            Route::put('/{id}', [SystemSettingController::class, 'updateRepaymentCycle'])->name('system-settings.repayment-cycles.update');
+            Route::delete('/{id}', [SystemSettingController::class, 'destroyRepaymentCycle'])->name('system-settings.repayment-cycles.destroy');
+        });
+
+        // Repayment Durations Routes
+        Route::prefix('repayment-durations')->group(function () {
+            Route::get('/', [SystemSettingController::class, 'repaymentDurations'])->name('system-settings.repayment-durations');
+            Route::post('/store', [SystemSettingController::class, 'storeRepaymentDuration'])->name('system-settings.repayment-durations.store');
+            Route::put('/{id}', [SystemSettingController::class, 'updateRepaymentDuration'])->name('system-settings.repayment-durations.update');
+            Route::delete('/{id}', [SystemSettingController::class, 'destroyRepaymentDuration'])->name('system-settings.repayment-durations.destroy');
+        });
+
+        // Payment Methods Routes
+        Route::prefix('payment-methods')->group(function () {
+            Route::get('/', [SystemSettingController::class, 'paymentMethods'])->name('system-settings.payment-methods');
+            Route::post('/store', [SystemSettingController::class, 'storePaymentMethod'])->name('system-settings.payment-methods.store');
+            Route::put('/{id}', [SystemSettingController::class, 'updatePaymentMethod'])->name('system-settings.payment-methods.update');
+            Route::delete('/{id}', [SystemSettingController::class, 'destroyPaymentMethod'])->name('system-settings.payment-methods.destroy');
+        });
+
+        // Loan Statuses Routes
+        Route::prefix('loan-statuses')->group(function () {
+            Route::get('/', [SystemSettingController::class, 'loanStatuses'])->name('system-settings.loan-statuses');
+            Route::post('/store', [SystemSettingController::class, 'storeLoanStatus'])->name('system-settings.loan-statuses.store');
+            Route::put('/{id}', [SystemSettingController::class, 'updateLoanStatus'])->name('system-settings.loan-statuses.update');
+            Route::delete('/{id}', [SystemSettingController::class, 'destroyLoanStatus'])->name('system-settings.loan-statuses.destroy');
+        });
     });
 
     // User Profile
