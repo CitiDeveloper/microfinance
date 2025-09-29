@@ -280,8 +280,19 @@
                             <span class="menu-text">Daily Collection</span>
                         </a>
                     </div>
+                    <div class="menu-item">
+                        <a href="{{ route('collection-sheets.missed') }}" class="menu-link">
+                            <span class="menu-text">Missed Repayments</span>
+                        </a>
+                    </div>
+                    <div class="menu-item">
+                        <a href="{{ route('collection-sheets.past-maturity') }}" class="menu-link">
+                            <span class="menu-text">Past Maturity</span>
+                        </a>
+                    </div>
                 </div>
             </div>
+
 
             <!-- Reports & Accounting -->
             <div class="menu-header">Reports & Accounting</div>
@@ -380,7 +391,8 @@
                 </a>
             </div>
             <div class="menu-item">
-                <a href="{{ route('logout') }}" class="menu-link" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                <a href="{{ route('logout') }}" class="menu-link"
+                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                     <span class="menu-icon"><i class="fa fa-sign-out-alt"></i></span>
                     <span class="menu-text">Logout</span>
                 </a>
@@ -389,7 +401,7 @@
         <!-- END menu -->
     </div>
     <!-- END scrollbar -->
-    
+
     <!-- BEGIN mobile-sidebar-backdrop -->
     <button class="app-sidebar-mobile-backdrop" data-dismiss="sidebar-mobile"></button>
     <!-- END mobile-sidebar-backdrop -->

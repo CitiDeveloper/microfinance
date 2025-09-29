@@ -12,30 +12,25 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Example User factory
-        // User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
-
-        // Call your custom seeders
+        
         $this->call([
-            // LoanProductSeeder::class,  
-            // AfterMaturityInterestOptionSeeder::class,
-            // BorrowerSeeder::class,
-            // BranchSeeder::class,
-            // DisbursementMethodSeeder::class,
-            // LoanPaymentSchemeSeeder::class,
-            // LoanStatusSeeder::class,
-            // RepaymentCycleSeeder::class,
-            // RoleSeeder::class,
-            // StaffSeeder::class,
-            // BankAccountSeeder::class,
-            // LoanSeeder::class,
-            // PaymentMethodSeeder::class,
-            // CollateralRegisterSeeder::class,
-            //RepaymentsTableSeeder::class,
-            //SystemSettingsSeeder::class,
+            UserSeeder::class,
+            LoanProductSeeder::class,
+            AfterMaturityInterestOptionSeeder::class,
+            BorrowerSeeder::class,
+            BranchSeeder::class,
+            DisbursementMethodSeeder::class,
+            LoanStatusSeeder::class,
+            RepaymentCycleSeeder::class,
+            RoleSeeder::class,
+            StaffSeeder::class,
+            BankAccountSeeder::class,
+            LoanSeeder::class,
+            LoanPaymentSchemeSeeder::class,
+            PaymentMethodSeeder::class,
+            CollateralRegisterSeeder::class,
+            RepaymentsTableSeeder::class,
+            SystemSettingsSeeder::class,
         ]);
     }
 }

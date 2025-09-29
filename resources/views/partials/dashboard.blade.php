@@ -125,10 +125,11 @@
         
         .top-performer::after {
             content: 'TOP PERFORMER';
-            position: absolute;
+            position:inherit;
+            margin-bottom: 15px;
             top: 0;
             right: 0;
-            background: var(--primary-color);
+            background: var(--info-color);
             color: white;
             font-size: 0.7rem;
             padding: 0.2rem 0.5rem;
@@ -168,7 +169,7 @@
                         <div class="row">
                             <div class="col-md-8">
                                 <h5 class="card-title text-muted mb-3">Weekly Loan Disbursements</h5>
-                                <h2 class="mb-2">${{ number_format($weeklyDisbursements, 2) }}</h2>
+                                <h2 class="mb-2">{{ ucfirst($systemSettings->currency) }} {{ number_format($weeklyDisbursements, 2) }}</h2>
                                 <p class="text-success mb-4">
                                     <i class="fas fa-caret-up me-1"></i> 
                                     <strong>{{ $disbursementGrowth }}%</strong> increase compared to last week
@@ -263,7 +264,7 @@
                     </div>
                     <div>
                         <h6 class="mb-1 text-muted small">Weekly Repayments</h6>
-                        <h4 class="mb-0 fw-bold">${{ number_format($weeklyRepayments, 0) }}</h4>
+                        <h4 class="mb-0 fw-bold">{{ ucfirst($systemSettings->currency) }} {{ number_format($weeklyRepayments, 0) }}</h4>
                     </div>
                 </div>
                 <a href="#" class="stretched-link"></a>
@@ -364,7 +365,7 @@
                                 </div>
                                 
                                 <div class="mb-4">
-                                    <h3 class="mb-1">${{ number_format($totalPortfolioValue, 2) }}</h3>
+                                    <h3 class="mb-1">{{ ucfirst($systemSettings->currency) }} {{ number_format($totalPortfolioValue, 2) }}</h3>
                                     <span class="text-success small">
                                         <i class="fas fa-caret-up me-1"></i> +{{ $portfolioGrowth }}%
                                     </span>
@@ -467,7 +468,7 @@
                                         <div class="text-muted small">{{ $branch->branch_city }}, {{ $branch->branch_country }}</div>
                                     </div>
                                     <div class="text-end">
-                                        <div class="fw-bold">${{ number_format($branch->total_portfolio, 2) }}</div>
+                                        <div class="fw-bold">{{ ucfirst($systemSettings->currency) }} {{ number_format($branch->total_portfolio, 2) }}</div>
                                         <div class="text-muted small">portfolio</div>
                                     </div>
                                 </div>
@@ -524,7 +525,7 @@
                                             <span class="badge bg-secondary bg-opacity-20 text-secondary">{{ $loan->loanStatus->status_name ?? 'Unknown' }}</span>
                                             @endif
                                         </td>
-                                        <td class="text-end pe-0 fw-bold">${{ number_format($loan->loan_principal_amount, 2) }}</td>
+                                        <td class="text-end pe-0 fw-bold">{{ ucfirst($systemSettings->currency) }} {{ number_format($loan->loan_principal_amount, 2) }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>

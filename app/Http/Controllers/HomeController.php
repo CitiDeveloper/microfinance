@@ -107,6 +107,7 @@ class HomeController extends Controller
 
         // Loan disbursement data for chart (last 30 days)
         $loanDisbursementData = $this->getLoanDisbursementChartData();
+        //dd($loanDisbursementData);
 
         return [
             'activeBranchesCount' => $activeBranchesCount,

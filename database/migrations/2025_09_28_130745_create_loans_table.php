@@ -45,7 +45,8 @@ return new class extends Migration
             $table->enum('loan_duration_period', ['Days', 'Weeks', 'Months', 'Years']);
 
             // Repayment information
-            $table->foreignId('loan_payment_scheme_id')->constrained('repayment_cycles');
+            $table->integer('loan_payment_scheme_id')->nullable();
+            $table->foreignId('repayment_cycle_id')->nullable()->constrained('repayment_cycles');
             $table->integer('loan_num_of_repayments');
 
             // Advanced settings
@@ -62,6 +63,8 @@ return new class extends Migration
             ])->default('round_off_to_two_decimal');
             $table->boolean('loan_decimal_places_adjust_each_interest')->default(false);
             $table->date('loan_interest_start_date')->nullable();
+            $table->date('loan_due_date')->nullable();
+            $table->unsignedInteger('grace_period_repayments')->default(0);
             $table->date('loan_first_repayment_date')->nullable();
             $table->boolean('loan_first_repayment_pro_rata')->default(false);
             $table->boolean('loan_fees_pro_rata')->default(false);
@@ -87,7 +90,9 @@ return new class extends Migration
             $table->string('after_maturity_calculate_interest_on')->nullable();
             $table->decimal('after_maturity_loan_interest', 8, 4)->nullable();
             $table->integer('after_maturity_recurring_period_num')->nullable();
-            $table->foreignId('after_maturity_recurring_period_payment_scheme_id')->nullable()->constrained('repayment_cycles');
+            $table->foreignId('after_maturity_recurring_period_payment_scheme_id')
+                ->nullable()
+                ->constrained('loan_payment_schemes');
             $table->integer('after_maturity_num_of_repayments')->nullable();
             $table->boolean('after_maturity_include_fees')->default(false);
             $table->boolean('after_maturity_past_maturity_status')->default(false);

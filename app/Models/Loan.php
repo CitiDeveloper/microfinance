@@ -29,7 +29,9 @@ class Loan extends Model
         'loan_duration_period',
         'loan_payment_scheme_id',
         'loan_num_of_repayments',
+        'grace_period_repayments',
         'loan_decimal_places',
+        'loan_due_date',
         'loan_decimal_places_adjust_each_interest',
         'loan_interest_start_date',
         'loan_first_repayment_date',
@@ -108,7 +110,7 @@ class Loan extends Model
 
     public function paymentScheme()
     {
-        return $this->belongsTo(RepaymentCycle::class, 'loan_payment_scheme_id');
+        return $this->belongsTo(RepaymentCycle::class, 'repayment_cycle_id');
     }
 
     public function loanStatus()
@@ -128,7 +130,7 @@ class Loan extends Model
 
     public function afterMaturityPaymentScheme()
     {
-        return $this->belongsTo(RepaymentCycle::class, 'loan_payment_scheme_id');
+        return $this->belongsTo(RepaymentCycle::class, 'repayment_cycle_id');
     }
 
     public function guarantors()
@@ -137,6 +139,10 @@ class Loan extends Model
     }
 
     public function repayments()
+    {
+        return $this->hasMany(Repayment::class);
+    }
+    public function repaymentSchedule()
     {
         return $this->hasMany(Repayment::class);
     }
@@ -186,5 +192,9 @@ class Loan extends Model
     public function canBeDisbursed()
     {
         return $this->isActive();
+    }
+    public function paymentSchedules()
+    {
+        return $this->hasMany(LoanPaymentScheme::class);
     }
 }

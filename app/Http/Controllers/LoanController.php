@@ -12,6 +12,8 @@ use App\Models\RepaymentCycle;
 use App\Models\LoanStatus;
 use App\Models\BankAccount;
 use App\Models\Guarantor;
+use App\Models\LoanPaymentScheme;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -71,6 +73,7 @@ class LoanController extends Controller
             'loan_payment_scheme_id' => 'required|exists:repayment_cycles,id',
             'loan_num_of_repayments' => 'required|integer|min:1',
             'loan_status_id' => 'required|exists:loan_statuses,id',
+            'grace_period_repayments' => 'required|integer|min:0',
             'dea_cash_bank_account' => 'required|exists:bank_accounts,id',
         ]);
 
@@ -103,12 +106,12 @@ class LoanController extends Controller
             'cashBankAccount',
             'guarantors',
             'repayments',
-            'collaterals'
+            'collaterals',
+            'paymentSchedules', // Add this line
+            'afterMaturityPaymentScheme' // Add this line
         ]);
-       
 
         return view('loans.show', compact('loan'));
-        
     }
 
     public function edit(Loan $loan)
@@ -156,6 +159,7 @@ class LoanController extends Controller
             'loan_duration_period' => 'required|in:Days,Weeks,Months,Years',
             'loan_payment_scheme_id' => 'required|exists:repayment_cycles,id',
             'loan_num_of_repayments' => 'required|integer|min:1',
+            'grace_period_repayments' => 'required|integer|min:0',
             'loan_status_id' => 'required|exists:loan_statuses,id',
             'dea_cash_bank_account' => 'required|exists:bank_accounts,id',
         ]);
@@ -253,8 +257,98 @@ class LoanController extends Controller
 
     private function createLoanSchedule(Loan $loan)
     {
-        // Implementation of loan schedule creation based on loan terms
-        // This would calculate all the repayment dates and amounts
-        // You would create RepaymentSchedule records here
+        $loanProduct   = $loan->loanProduct; // relation Loan -> LoanProduct
+        $principal     = $loan->loan_principal_amount;
+        $numRepayments = $loan->loan_num_of_repayments;
+        $releasedDate  = Carbon::parse($loan->loan_released_date);
+
+        $interestRate   = $loan->loan_interest ?? $loanProduct->default_loan_interest;
+        $interestType   = strtolower($loanProduct->loan_interest_type);   // percentage | fixed
+        $interestMethod = strtolower($loanProduct->loan_interest_method); // flat | reducing | interest-only
+        $interestPeriod = strtolower($loanProduct->loan_interest_period); // per month | per year
+        $durationPeriod = strtolower($loan->loan_duration_period);
+
+        // --- Adjust first repayment date ---
+        $firstRepaymentDate = $releasedDate->copy();
+        if (!empty($loanProduct->loan_move_first_repayment_date_days)) {
+            $firstRepaymentDate->addDays($loanProduct->loan_move_first_repayment_date_days);
+        }
+
+        // --- Normalize interest ---
+        if ($interestType === 'percentage') {
+            $ratePerPeriod = match ($interestPeriod) {
+                'year', 'annually', 'per year' => $interestRate / 12,  // monthly rate
+                'month', 'monthly', 'per month' => $interestRate,      // already monthly
+                default => $interestRate,
+            };
+        } else {
+            $ratePerPeriod = 0; // handled separately for fixed
+        }
+
+        // --- Grace Period (optional) ---
+        $graceRepayments = $loan->grace_period_repayments ?? 0;
+        // You may want this as a column in `loans` table or default from LoanProduct
+
+        for ($i = 1; $i <= $numRepayments; $i++) {
+            // due date calculation
+            $dueDate = match ($durationPeriod) {
+                'days'   => $firstRepaymentDate->copy()->addDays($i * $loan->loan_duration),
+                'weeks'  => $firstRepaymentDate->copy()->addWeeks($i * $loan->loan_duration),
+                'months' => $firstRepaymentDate->copy()->addMonths($i * $loan->loan_duration),
+                'years'  => $firstRepaymentDate->copy()->addYears($i * $loan->loan_duration),
+                default  => $firstRepaymentDate->copy()->addMonths($i),
+            };
+
+            $principalDue = 0;
+            $interestDue  = 0;
+
+            // --- Grace Period Handling ---
+            if ($i <= $graceRepayments) {
+                // Grace = only interest during this period
+                if ($interestType === 'percentage') {
+                    $interestDue = ($principal * $ratePerPeriod) / 100;
+                } else {
+                    $interestDue = $interestRate / $numRepayments;
+                }
+            } else {
+                // --- Regular repayment rules ---
+                switch ($interestMethod) {
+                    case 'flat':
+                        $principalDue = $principal / $numRepayments;
+                        $interestDue  = ($interestType === 'percentage')
+                            ? ($principal * $ratePerPeriod) / 100
+                            : $interestRate / $numRepayments;
+                        break;
+
+                    case 'reducing':
+                        $principalDue = $principal / $numRepayments;
+                        $outstanding  = $principal - ($principalDue * ($i - 1));
+                        $interestDue  = ($interestType === 'percentage')
+                            ? ($outstanding * $ratePerPeriod) / 100
+                            : $interestRate / $numRepayments;
+                        break;
+
+                    case 'interest-only':
+                        $principalDue = ($i === $numRepayments) ? $principal : 0;
+                        $interestDue  = ($interestType === 'percentage')
+                            ? ($principal * $ratePerPeriod) / 100
+                            : $interestRate / $numRepayments;
+                        break;
+
+                    default:
+                        $principalDue = $principal / $numRepayments;
+                        $interestDue  = ($principal * $ratePerPeriod) / 100;
+                }
+            }
+
+            LoanPaymentScheme::create([
+                'loan_id'            => $loan->id,
+                'installment_number' => $i,
+                'due_date'           => $dueDate,
+                'principal_amount'   => round($principalDue, 2),
+                'interest_amount'    => round($interestDue, 2),
+                'total_amount'       => round($principalDue + $interestDue, 2),
+            ]);
+        }
     }
 }
