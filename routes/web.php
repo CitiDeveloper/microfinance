@@ -146,7 +146,15 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{collectionSheet}/edit', [CollectionSheetController::class, 'edit'])->name('collection-sheets.edit');
         Route::put('/{collectionSheet}', [CollectionSheetController::class, 'update'])->name('collection-sheets.update');
         Route::delete('/{collectionSheet}', [CollectionSheetController::class, 'destroy'])->name('collection-sheets.destroy');
+
+        // Additional routes for specific types
         Route::get('/daily', [CollectionSheetController::class, 'daily'])->name('collection-sheets.daily');
+        Route::get('/missed', [CollectionSheetController::class, 'missed'])->name('collection-sheets.missed');
+        Route::get('/past-maturity', [CollectionSheetController::class, 'pastMaturity'])->name('collection-sheets.past-maturity');
+
+        // Collection actions
+        Route::post('/{collectionSheet}/collect', [CollectionSheetController::class, 'processCollection'])->name('collection-sheets.collect');
+        Route::post('/items/{item}/update-collection', [CollectionSheetController::class, 'updateCollection'])->name('collection-sheets.update-collection');
     });
 
     // Savings
@@ -263,6 +271,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [SystemSettingController::class, 'index'])->name('system-settings.index');
         Route::put('/', [SystemSettingController::class, 'update'])->name('system-settings.update');
         Route::post('/backup', [SystemSettingController::class, 'backup'])->name('system-settings.backup');
+        Route::get('/system', [SystemSettingController::class, 'system'])->name('system');
 
         // Bank Accounts Routes
         Route::prefix('bank-accounts')->group(function () {

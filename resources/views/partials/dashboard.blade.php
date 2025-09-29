@@ -1,482 +1,537 @@
-<!-- Dashboard Header -->
-<h1 class="page-header mb-3">
-    Hi, {{ Auth::user()->name ?? 'User' }}. <small>here's what's happening with your branches today.</small>
-</h1>
-
-<!-- BEGIN row -->
-<div class="row">
-    <!-- BEGIN col-6 -->
-    <div class="col-xl-6 mb-3">
-        <!-- BEGIN card -->
-        <div class="card h-100 overflow-hidden">
-            <!-- BEGIN card-img-overlay -->
-            <div class="card-img-overlay d-block d-lg-none bg-blue rounded"></div>
-            <!-- END card-img-overlay -->
-            
-            <!-- BEGIN card-img-overlay -->
-            <div class="card-img-overlay d-none d-md-block bg-blue rounded mb-n1 mx-n1" style="background-image: url(assets/img/bg/wave-bg.png); background-position: right bottom; background-repeat: no-repeat; background-size: 100%;"></div>
-            <!-- END card-img-overlay -->
-            
-            <!-- BEGIN card-img-overlay -->
-            <div class="card-img-overlay d-none d-md-block bottom-0 top-auto">
-                <div class="row">
-                    <div class="col-md-8 col-xl-6"></div>
-                    <div class="col-md-4 col-xl-6 mb-n2">
-                        <img src="assets/img/page/dashboard.svg" alt="" class="d-block ms-n3 mb-5" style="max-height: 310px">
-                    </div>
+    <style>
+        :root {
+            --primary-color: #2c5aa0;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #0dcaf0;
+            --light-bg: #f8f9fa;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --card-hover-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        
+        .dashboard-header {
+            padding: 1.5rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card:hover {
+            box-shadow: var(--card-hover-shadow);
+        }
+        
+        .stat-card {
+            padding: 1.5rem;
+            border-radius: 12px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(40%, -40%);
+        }
+        
+        .stat-card .icon-container {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.2);
+            margin-bottom: 1rem;
+        }
+        
+        .progress {
+            height: 6px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+        
+        .progress-bar {
+            border-radius: 3px;
+        }
+        
+        .loan-status-chart .progress {
+            height: 10px;
+        }
+        
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: var(--secondary-color);
+            font-size: 0.875rem;
+        }
+        
+        .badge {
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            border-radius: 8px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+        }
+        
+        .btn-primary:hover {
+            background-color: #244a8a;
+            border-color: #244a8a;
+        }
+        
+        .chart-container {
+            height: 300px;
+        }
+        
+        .branch-item {
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .branch-item:last-child {
+            border-bottom: none;
+        }
+        
+        .top-performer {
+            position: relative;
+        }
+        
+        .top-performer::after {
+            content: 'TOP PERFORMER';
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--primary-color);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+        }
+        
+        .text-muted {
+            color: #6c757d !important;
+        }
+    </style>
+  <div class="container-fluid">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="h3 mb-1">Welcome back, {{ Auth::user()->name ?? 'User' }}</h1>
+                    <p class="text-muted mb-0">Here's what's happening with your branches today.</p>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i> New Loan
+                    </button>
                 </div>
             </div>
-            <!-- END card-img-overlay -->
-            
-            <!-- BEGIN card-body -->
-            <div class="card-body position-relative text-white text-opacity-70">
-                <!-- BEGIN row -->
-                <div class="row">
-                    <!-- BEGIN col-8 -->
-                    <div class="col-md-8">
-                        <!-- stat-top -->
-                        <div class="d-flex">
-                            <div class="me-auto">
-                                <h5 class="text-white text-opacity-80 mb-3">Weekly Loan Disbursements</h5>
-                                <h3 class="text-white mt-n1 mb-1">${{ number_format($weeklyDisbursements, 2) }}</h3>
-                                <p class="mb-1 text-white text-opacity-60 text-truncate">
-                                    <i class="fa fa-caret-up"></i> <b>{{ $disbursementGrowth }}%</b> increase compared to last week
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <hr class="bg-white bg-opacity-75 mt-3 mb-3">
-                        
-                        <!-- stat-bottom -->
-                        <div class="row">
-                            <div class="col-6 col-lg-5">
-                                <div class="mt-1">
-                                    <i class="fa fa-fw fa-hand-holding-usd fs-28px text-black text-opacity-50"></i>
-                                </div>
-                                <div class="mt-1">
-                                    <div>Active Loans</div>
-                                    <div class="fw-600 text-white">{{ $activeLoansCount }}</div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-lg-5">
-                                <div class="mt-1">
-                                    <i class="fa fa-fw fa-users fs-28px text-black text-opacity-50"></i>
-                                </div>
-                                <div class="mt-1">
-                                    <div>Active Borrowers</div>
-                                    <div class="fw-600 text-white">{{ $activeBorrowersCount }}</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <hr class="bg-white bg-opacity-75 mt-3 mb-3">
-                        
-                        <div class="mt-3 mb-2">
-                            <a href="{{ route('loans.create') }}" class="btn btn-yellow btn-rounded btn-sm ps-5 pe-5 pt-2 pb-2 fs-14px fw-600"><i class="fa fa-plus me-2 ms-n2"></i> New Loan</a>
-                        </div>
-                        <p class="fs-12px">
-                            Track all loan applications and disbursements from your dashboard.
-                        </p>
-                    </div>
-                    <!-- END col-8 -->
-                    
-                    <!-- BEGIN col-4 -->
-                    <div class="col-md-4 d-none d-md-block" style="min-height: 380px;"></div>
-                    <!-- END col-4 -->
-                </div>
-                <!-- END row -->
-            </div>
-            <!-- END card-body -->
         </div>
-        <!-- END card -->
-    </div>
-    <!-- END col-6 -->
-    
-    <!-- BEGIN col-6 -->
-    <div class="col-xl-6">
-        <!-- BEGIN row -->
-        <div class="row">
-            <!-- BEGIN col-6 -->
-            <div class="col-sm-6">
-                <!-- BEGIN card -->
-                <div class="card mb-3 overflow-hidden fs-13px border-0 bg-gradient-custom-orange" style="min-height: 199px;">
-                    <!-- BEGIN card-img-overlay -->
-                    <div class="card-img-overlay mb-n4 me-n4 d-flex" style="bottom: 0; top: auto;">
-                        <img src="assets/img/icon/order.svg" alt="" class="ms-auto d-block mb-n3" style="max-height: 105px">
-                    </div>
-                    <!-- END card-img-overlay -->
-                    
-                    <!-- BEGIN card-body -->
-                    <div class="card-body position-relative">
-                        <h5 class="text-white text-opacity-80 mb-3 fs-16px">Pending Approvals</h5>
-                        <h3 class="text-white mt-n1">{{ $pendingLoansCount }}</h3>
-                        <div class="progress bg-black bg-opacity-50 mb-2" style="height: 6px">
-                            <div class="progrss-bar progress-bar-striped bg-white" style="width: {{ min($pendingLoansCount / max($totalLoansCount, 1) * 100, 100) }}%"></div>
-                        </div>
-                        <div class="text-white text-opacity-80 mb-4"><i class="fa fa-clock"></i> {{ $pendingLoansCount }} loans awaiting <br>review and approval</div>
-                        <div><a href="{{ route('loans.index', ['status' => 'pending']) }}" class="text-white d-flex align-items-center text-decoration-none">View pending <i class="fa fa-chevron-right ms-2 text-white text-opacity-50"></i></a></div>
-                    </div>
-                    <!-- BEGIN card-body -->
-                </div>
-                <!-- END card -->
-                
-                <!-- BEGIN card -->
-                <div class="card mb-3 overflow-hidden fs-13px border-0 bg-gradient-custom-teal" style="min-height: 199px;">
-                    <!-- BEGIN card-img-overlay -->
-                    <div class="card-img-overlay mb-n4 me-n4 d-flex" style="bottom: 0; top: auto;">
-                        <img src="assets/img/icon/visitor.svg" alt="" class="ms-auto d-block mb-n3" style="max-height: 105px">
-                    </div>
-                    <!-- END card-img-overlay -->
-                    
-                    <!-- BEGIN card-body -->
-                    <div class="card-body position-relative">
-                        <h5 class="text-white text-opacity-80 mb-3 fs-16px">Overdue Loans</h5>
-                        <h3 class="text-white mt-n1">{{ $overdueLoansCount }}</h3>
-                        <div class="progress bg-black bg-opacity-50 mb-2" style="height: 6px">
-                            <div class="progrss-bar progress-bar-striped bg-white" style="width: {{ min($overdueLoansCount / max($activeLoansCount, 1) * 100, 100) }}%"></div>
-                        </div>
-                        <div class="text-white text-opacity-80 mb-4"><i class="fa fa-exclamation-triangle"></i> {{ $overdueAmount }} total <br>overdue amount</div>
-                        <div><a href="{{ route('loans.index', ['status' => 'overdue']) }}" class="text-white d-flex align-items-center text-decoration-none">View overdue <i class="fa fa-chevron-right ms-2 text-white text-opacity-50"></i></a></div>
-                    </div>
-                    <!-- END card-body -->
-                </div>
-                <!-- END card -->
-            </div>
-            <!-- END col-6 -->
-            
-            <!-- BEGIN col-6 -->
-            <div class="col-sm-6">
-                <!-- BEGIN card -->
-                <div class="card mb-3 overflow-hidden fs-13px border-0 bg-gradient-custom-pink" style="min-height: 199px;">
-                    <!-- BEGIN card-img-overlay -->
-                    <div class="card-img-overlay mb-n4 me-n4 d-flex" style="bottom: 0; top: auto;">
-                        <img src="assets/img/icon/email.svg" alt="" class="ms-auto d-block mb-n3" style="max-height: 105px">
-                    </div>
-                    <!-- END card-img-overlay -->
-                    
-                    <!-- BEGIN card-body -->
-                    <div class="card-body position-relative">
-                        <h5 class="text-white text-opacity-80 mb-3 fs-16px">Weekly Repayments</h5>
-                        <h3 class="text-white mt-n1">${{ number_format($weeklyRepayments, 2) }}</h3>
-                        <div class="progress bg-black bg-opacity-50 mb-2" style="height: 6px">
-                            <div class="progrss-bar progress-bar-striped bg-white" style="width: {{ min($weeklyRepayments / max($weeklyDisbursements, 1) * 100, 100) }}%"></div>
-                        </div>
-                        <div class="text-white text-opacity-80 mb-4"><i class="fa fa-caret-up"></i> {{ $repaymentGrowth }}% increase <br>compared to last week</div>
-                        <div><a href="{{ route('repayments.index') }}" class="text-white d-flex align-items-center text-decoration-none">View repayments <i class="fa fa-chevron-right ms-2 text-white text-opacity-50"></i></a></div>
-                    </div>
-                    <!-- END card-body -->
-                </div>
-                <!-- END card -->
-                
-                <!-- BEGIN card -->
-                <div class="card mb-3 overflow-hidden fs-13px border-0 bg-gradient-custom-indigo" style="min-height: 199px;">
-                    <!-- BEGIN card-img-overlay -->
-                    <div class="card-img-overlay mb-n4 me-n4 d-flex" style="bottom: 0; top: auto;">
-                        <img src="assets/img/icon/browser.svg" alt="" class="ms-auto d-block mb-n3" style="max-height: 105px">
-                    </div>
-                    <!-- end card-img-overlay -->
-                    
-                    <!-- BEGIN card-body -->
-                    <div class="card-body position-relative">
-                        <h5 class="text-white text-opacity-80 mb-3 fs-16px">Active Branches</h5>
-                        <h3 class="text-white mt-n1">{{ $activeBranchesCount }}</h3>
-                        <div class="progress bg-black bg-opacity-50 mb-2" style="height: 6px">
-                            <div class="progrss-bar progress-bar-striped bg-white" style="width: 100%"></div>
-                        </div>
-                        <div class="text-white text-opacity-80 mb-4"><i class="fa fa-building"></i> All branches <br>operational</div>
-                        <div><a href="{{ route('branches.index') }}" class="text-white d-flex align-items-center text-decoration-none">Manage branches <i class="fa fa-chevron-right ms-2 text-white text-opacity-50"></i></a></div>
-                    </div>
-                    <!-- END card-body -->
-                </div>
-                <!-- END card -->
-            </div>
-            <!-- BEGIN col-6 -->
-        </div>
-        <!-- END row -->
-    </div>
-    <!-- END col-6 -->
-</div>
-<!-- END row -->
 
-<!-- BEGIN row -->
-<div class="row">
-    <!-- BEGIN col-6 -->
-    <div class="col-xl-6">
-        <!-- BEGIN row -->
+        <!-- Key Metrics Row -->
         <div class="row">
-            <!-- BEGIN col-6 -->
-            <div class="col-sm-6 mb-3 d-flex flex-column">
-                <!-- BEGIN card -->
-                <div class="card mb-3 flex-1">
-                    <!-- BEGIN card-body -->
-                    <div class="card-body">
-                        <div class="d-flex mb-3">
-                            <div class="flex-grow-1">
-                                <h5 class="mb-1">Total Borrowers</h5>
-                                <div>Registered borrower accounts</div>
-                            </div>
-                            <a href="javascript:;" class="text-secondary"><i class="fa fa-redo"></i></a>
-                        </div>
-                        
-                        <div class="d-flex">
-                            <div class="flex-grow-1">
-                                <h3 class="mb-1">{{ $totalBorrowersCount }}</h3>
-                                <div class="text-success fw-600 fs-13px">
-                                    <i class="fa fa-caret-up"></i> +{{ $borrowerGrowth }}%
-                                </div>
-                            </div>
-                            <div class="w-50px h-50px bg-primary bg-opacity-20 rounded-circle d-flex align-items-center justify-content-center">
-                                <i class="fa fa-users fa-lg text-primary"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- END card-body -->
-                </div>
-                <!-- END card -->
-                
-                <!-- BEGIN card -->
+            <!-- Main Metric Card -->
+            <div class="col-lg-6">
                 <div class="card">
-                    <!-- BEGIN card-body -->
-                    <div class="card-body">
-                        <div class="d-flex mb-3">
-                            <div class="flex-grow-1">
-                                <h5 class="mb-1">Loan Products</h5>
-                                <div>Active loan products</div>
-                            </div>
-                            <a href="javascript:;" class="text-secondary"><i class="fa fa-redo"></i></a>
-                        </div>
-                        
-                        <!-- BEGIN row -->
+                    <div class="card-body p-4">
                         <div class="row">
-                            <!-- BEGIN col-6 -->
-                            <div class="col-6 text-center">
-                                <div class="w-50px h-50px bg-primary bg-opacity-20 rounded-circle d-flex align-items-center justify-content-center mb-2 ms-auto me-auto">
-                                    <i class="fa fa-cube fa-lg text-primary"></i>
-                                </div>
-                                <div class="fw-600 text-body">{{ $activeLoanProductsCount }}</div>
-                                <div class="fs-13px">Active</div>
-                            </div>
-                            <!-- END col-6 -->
-                            
-                            <!-- BEGIN col-6 -->
-                            <div class="col-6 text-center">
-                                <div class="w-50px h-50px bg-primary bg-opacity-20 rounded-circle d-flex align-items-center justify-content-center mb-2 ms-auto me-auto">
-                                    <i class="fa fa-chart-line fa-lg text-primary"></i>
-                                </div>
-                                <div class="fw-600 text-body">{{ $mostPopularProduct->loans_count ?? 0 }}</div>
-                                <div class="fs-13px">Most Popular</div>
-                            </div>
-                            <!-- END col-6 -->
-                        </div>
-                        <!-- END row -->
-                    </div>
-                    <!-- END card-body -->
-                </div>
-                <!-- END card -->
-            </div>
-            <!-- END col-6 -->
-            
-            <!-- BEGIN col-6 -->
-            <div class="col-sm-6 mb-3">
-                <!-- BEGIN card -->
-                <div class="card h-100">	
-                    <!-- BEGIN card-body -->
-                    <div class="card-body">
-                        <div class="d-flex mb-3">
-                            <div class="flex-grow-1">
-                                <h5 class="mb-1">Loan Portfolio</h5>
-                                <div class="fs-13px">Loan status distribution</div>
-                            </div>
-                            <a href="javascript:;" class="text-secondary"><i class="fa fa-redo"></i></a>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <h3 class="mb-1">${{ number_format($totalPortfolioValue, 2) }}</h3>
-                            <div class="text-success fs-13px fw-600">
-                                <i class="fa fa-caret-up"></i> +{{ $portfolioGrowth }}%
-                            </div>
-                        </div>
-                        
-                        <div class="progress mb-4" style="height: 10px;">
-                            <div class="progress-bar bg-primary" style="width: {{ $loanStatusDistribution['active'] }}%"></div>
-                            <div class="progress-bar bg-teal" style="width: {{ $loanStatusDistribution['pending'] }}%"></div>
-                            <div class="progress-bar bg-yellow" style="width: {{ $loanStatusDistribution['overdue'] }}%"></div>
-                            <div class="progress-bar bg-pink" style="width: {{ $loanStatusDistribution['closed'] }}%"></div>
-                            <div class="progress-bar bg-gray-200" style="width: {{ $loanStatusDistribution['other'] }}%"></div>
-                        </div>
-                        
-                        <div class="fs-13px">
-                            <div class="d-flex align-items-center mb-2">
-                                <div class="flex-grow-1 d-flex align-items-center">
-                                    <i class="fa fa-circle fs-9px fa-fw text-primary me-2"></i> Active Loans
-                                </div>
-                                <div class="fw-600 text-body">{{ number_format($loanStatusDistribution['active'], 1) }}%</div>
-                            </div>
-                            <div class="d-flex align-items-center mb-2">
-                                <div class="flex-grow-1 d-flex align-items-center">
-                                    <i class="fa fa-circle fs-9px fa-fw text-teal me-2"></i> Pending Approval
-                                </div>
-                                <div class="fw-600 text-body">{{ number_format($loanStatusDistribution['pending'], 1) }}%</div>
-                            </div>
-                            <div class="d-flex align-items-center mb-2">
-                                <div class="flex-grow-1 d-flex align-items-center">
-                                    <i class="fa fa-circle fs-9px fa-fw text-warning me-2"></i> Overdue
-                                </div>
-                                <div class="fw-600 text-body">{{ number_format($loanStatusDistribution['overdue'], 1) }}%</div>
-                            </div>
-                            <div class="d-flex align-items-center mb-2">
-                                <div class="flex-grow-1 d-flex align-items-center">
-                                    <i class="fa fa-circle fs-9px fa-fw text-danger me-2"></i> Closed
-                                </div>
-                                <div class="fw-600 text-body">{{ number_format($loanStatusDistribution['closed'], 1) }}%</div>
-                            </div>
-                            <div class="d-flex align-items-center mb-15px">
-                                <div class="flex-grow-1 d-flex align-items-center">
-                                    <i class="fa fa-circle fs-9px fa-fw text-gray-200 me-2"></i> Other
-                                </div>
-                                <div class="fw-600 text-body">{{ number_format($loanStatusDistribution['other'], 1) }}%</div>
-                            </div>
-                            <div class="fs-12px text-end">
-                                <span class="fs-10px">updated </span>
-                                <span class="d-inline-flex fw-600">
-                                    {{ now()->format('M j, Y') }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- END card-body -->
-                </div>
-                <!-- END card -->
-            </div>
-            <!-- END col-6 -->
-        </div>
-        <!-- END row -->
-    </div>
-    <!-- END col-6 -->
-    
-    <!-- BEGIN col-6 -->
-    <!-- BEGIN col-6 -->
-<div class="col-xl-6 mb-3">
-    <!-- BEGIN card -->
-    <div class="card h-100">
-        <!-- BEGIN card-body -->
-        <div class="card-body">
-       
-            <div id="loanDisbursementChart" style="min-height: 300px;"></div>
-        </div>
-        <!-- END card-body -->
-    </div>
-    <!-- END card -->
-</div>	
-    <!-- END col-6 -->
-</div>
-<!-- END row -->
-
-<!-- BEGIN row -->
-<div class="row">
-    <!-- BEGIN col-6 -->
-    <div class="col-xl-6 mb-3">
-        <!-- BEGIN card -->
-        <div class="card h-100">
-            <!-- BEGIN card-body -->
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-4">
-                    <div class="flex-grow-1">
-                        <h5 class="mb-1">Top Performing Branches</h5>
-                        <div class="fs-13px">Branches with highest loan portfolio</div>
-                    </div>
-                    <a href="{{ route('branches.index') }}" class="text-decoration-none">See All</a>
-                </div>
-                
-                @foreach($topBranches as $index => $branch)
-                <!-- branch-1 -->
-                <div class="d-flex align-items-center mb-3">
-                    <div class="d-flex align-items-center justify-content-center me-3 w-50px h-50px bg-white p-3px rounded">
-                        <i class="fa fa-building fa-lg text-primary"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <div>
-                            @if($index == 0)
-                            <div class="text-primary fs-10px fw-600">TOP PERFORMER</div>
-                            @endif
-                            <div class="text-body fw-600">{{ $branch->branch_name }}</div>
-                            <div class="fs-13px">{{ $branch->branch_city }}, {{ $branch->branch_country }}</div>
-                        </div>
-                    </div>
-                    <div class="ps-3 text-center">
-                        <div class="text-body fw-600">${{ number_format($branch->total_portfolio, 2) }}</div>
-                        <div class="fs-13px">portfolio</div>
-                    </div>
-                </div>
-                @endforeach
-            </div>
-            <!-- END card-body -->
-        </div>
-        <!-- END card -->
-    </div>
-    <!-- END col-6 -->
-    
-    <!-- BEGIN col-6 -->
-    <div class="col-xl-6 mb-3">
-        <!-- BEGIN card -->
-        <div class="card h-100">
-            <!-- BEGIN card-body -->
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-2">
-                    <div class="flex-grow-1">
-                        <h5 class="mb-1">Recent Loan Applications</h5>
-                        <div class="fs-13px">Latest loan application requests</div>
-                    </div>
-                    <a href="{{ route('loans.index') }}" class="text-decoration-none">See All</a>
-                </div>
-                
-                <!-- BEGIN table-responsive -->
-                <div class="table-responsive mb-n2">
-                    <table class="table table-borderless mb-0">
-                        <thead>
-                            <tr class="text-body">
-                                <th class="ps-0">No</th>
-                                <th>Application Details</th>
-                                <th class="text-center">Status</th>
-                                <th class="text-end pe-0">Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($recentLoans as $index => $loan)
-                            <tr>
-                                <td class="ps-0">{{ $index + 1 }}.</td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="w-40px h-40px">
-                                            <i class="fa fa-file-invoice-dollar fa-2x text-primary"></i>
-                                        </div>
-                                        <div class="ms-3 flex-grow-1">
-                                            <div class="fw-600 text-body">{{ $loan->borrower->full_name }}</div>
-                                            <div class="fs-13px">{{ $loan->loanProduct->loan_product_name ?? 'N/A' }}</div>
+                            <div class="col-md-8">
+                                <h5 class="card-title text-muted mb-3">Weekly Loan Disbursements</h5>
+                                <h2 class="mb-2">${{ number_format($weeklyDisbursements, 2) }}</h2>
+                                <p class="text-success mb-4">
+                                    <i class="fas fa-caret-up me-1"></i> 
+                                    <strong>{{ $disbursementGrowth }}%</strong> increase compared to last week
+                                </p>
+                                
+                                <div class="row mb-4">
+                                    <div class="col-6">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="icon-container me-3 bg-primary bg-opacity-10 text-primary">
+                                                <i class="fas fa-hand-holding-usd"></i>
+                                            </div>
+                                            <div>
+                                                <div class="text-muted small">Active Loans</div>
+                                                <div class="fw-bold fs-5">{{ $activeLoansCount }}</div>
+                                            </div>
                                         </div>
                                     </div>
-                                </td>
-                                <td class="text-center">
-                                    @if($loan->loan_status_id == 8)
-                                    <span class="badge bg-warning bg-opacity-20 text-warning" style="min-width: 60px;">Pending</span>
-                                    @elseif($loan->loan_status_id == 1)
-                                    <span class="badge bg-success bg-opacity-20 text-success" style="min-width: 60px;">Approved</span>
-                                    @else
-                                    <span class="badge bg-secondary bg-opacity-20 text-secondary" style="min-width: 60px;">{{ $loan->loanStatus->status_name ?? 'Unknown' }}</span>
-                                    @endif
-                                </td>
-                                <td class="text-end pe-0">${{ number_format($loan->loan_principal_amount, 2) }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                                    <div class="col-6">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="icon-container me-3 bg-info bg-opacity-10 text-info">
+                                                <i class="fas fa-users"></i>
+                                            </div>
+                                            <div>
+                                                <div class="text-muted small">Active Borrowers</div>
+                                                <div class="fw-bold fs-5">{{ $activeBorrowersCount }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <button class="btn btn-primary mb-2">
+                                    <i class="fas fa-plus me-2"></i> New Loan Application
+                                </button>
+                                <p class="text-muted small">
+                                    Track all loan applications and disbursements from your dashboard.
+                                </p>
+                            </div>
+                            <div class="col-md-4 d-none d-md-block text-center">
+                                <img src="assets/img/page/dashboard.svg" alt="Dashboard" class="img-fluid" style="max-height: 200px;">
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <!-- END table-responsive -->
             </div>
-            <!-- END card-body -->
+            
+            <!-- Secondary Metrics -->
+            <div class="col-lg-6">
+              <div class="row g-3 mb-4">
+    <!-- Pending Approvals -->
+    <div class="col-xl-6 col-md-6">
+        <div class="card border-0 shadow-sm h-100 hover-shadow">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center">
+                    <div class="icon-shape bg-warning bg-opacity-10 text-warning rounded-3 me-3 p-2">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-1 text-muted small">Pending Approvals</h6>
+                        <h4 class="mb-0 fw-bold">{{ $pendingLoansCount }}</h4>
+                    </div>
+                </div>
+                <a href="#" class="stretched-link"></a>
+            </div>
         </div>
-        <!-- END card -->
     </div>
-    <!-- END col-6 -->
+
+    <!-- Overdue Loans -->
+    <div class="col-xl-6 col-md-6">
+        <div class="card border-0 shadow-sm h-100 hover-shadow">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center">
+                    <div class="icon-shape bg-danger bg-opacity-10 text-danger rounded-3 me-3 p-2">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-1 text-muted small">Overdue Loans</h6>
+                        <h4 class="mb-0 fw-bold">{{ $overdueLoansCount }}</h4>
+                    </div>
+                </div>
+                <a href="#" class="stretched-link"></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Weekly Repayments -->
+    <div class="col-xl-6 col-md-6">
+        <div class="card border-0 shadow-sm h-100 hover-shadow">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center">
+                    <div class="icon-shape bg-success bg-opacity-10 text-success rounded-3 me-3 p-2">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-1 text-muted small">Weekly Repayments</h6>
+                        <h4 class="mb-0 fw-bold">${{ number_format($weeklyRepayments, 0) }}</h4>
+                    </div>
+                </div>
+                <a href="#" class="stretched-link"></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Branches -->
+    <div class="col-xl-6 col-md-6">
+        <div class="card border-0 shadow-sm h-100 hover-shadow">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center">
+                    <div class="icon-shape bg-info bg-opacity-10 text-info rounded-3 me-3 p-2">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-1 text-muted small">Active Branches</h6>
+                        <h4 class="mb-0 fw-bold">{{ $activeBranchesCount }}</h4>
+                    </div>
+                </div>
+                <a href="#" class="stretched-link"></a>
+            </div>
+        </div>
+    </div>
 </div>
-<!-- END row -->
+            </div>
+        </div>
+
+        <!-- Portfolio & Analytics Row -->
+        <div class="row">
+            <!-- Portfolio Stats -->
+            <div class="col-lg-6">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <h5 class="card-title mb-1">Total Borrowers</h5>
+                                        <p class="text-muted small mb-0">Registered borrower accounts</p>
+                                    </div>
+                                    <a href="#" class="text-muted"><i class="fas fa-redo"></i></a>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-end">
+                                    <div>
+                                        <h3 class="mb-1">{{ $totalBorrowersCount }}</h3>
+                                        <span class="text-success small">
+                                            <i class="fas fa-caret-up me-1"></i> +{{ $borrowerGrowth }}%
+                                        </span>
+                                    </div>
+                                    <div class="icon-container bg-primary bg-opacity-10 text-primary">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <h5 class="card-title mb-1">Loan Products</h5>
+                                        <p class="text-muted small mb-0">Active loan products</p>
+                                    </div>
+                                    <a href="#" class="text-muted"><i class="fas fa-redo"></i></a>
+                                </div>
+                                
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <div class="icon-container bg-primary bg-opacity-10 text-primary mx-auto mb-2">
+                                            <i class="fas fa-cube"></i>
+                                        </div>
+                                        <div class="fw-bold">{{ $activeLoanProductsCount }}</div>
+                                        <div class="text-muted small">Active</div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="icon-container bg-primary bg-opacity-10 text-primary mx-auto mb-2">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                        <div class="fw-bold">{{ $mostPopularProduct->loans_count ?? 0 }}</div>
+                                        <div class="text-muted small">Most Popular</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <h5 class="card-title mb-1">Loan Portfolio</h5>
+                                        <p class="text-muted small mb-0">Loan status distribution</p>
+                                    </div>
+                                    <a href="#" class="text-muted"><i class="fas fa-redo"></i></a>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <h3 class="mb-1">${{ number_format($totalPortfolioValue, 2) }}</h3>
+                                    <span class="text-success small">
+                                        <i class="fas fa-caret-up me-1"></i> +{{ $portfolioGrowth }}%
+                                    </span>
+                                </div>
+                                
+                                <div class="loan-status-chart mb-4">
+                                    <div class="progress mb-4">
+                                        <div class="progress-bar bg-primary" style="width: {{ $loanStatusDistribution['active'] }}%"></div>
+                                        <div class="progress-bar bg-info" style="width: {{ $loanStatusDistribution['pending'] }}%"></div>
+                                        <div class="progress-bar bg-warning" style="width: {{ $loanStatusDistribution['overdue'] }}%"></div>
+                                        <div class="progress-bar bg-danger" style="width: {{ $loanStatusDistribution['closed'] }}%"></div>
+                                        <div class="progress-bar bg-secondary" style="width: {{ $loanStatusDistribution['other'] }}%"></div>
+                                    </div>
+                                    
+                                    <div class="small">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-circle text-primary me-2" style="font-size: 8px;"></i>
+                                                <span>Active Loans</span>
+                                            </div>
+                                            <span class="fw-bold">{{ number_format($loanStatusDistribution['active'], 1) }}%</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-circle text-info me-2" style="font-size: 8px;"></i>
+                                                <span>Pending Approval</span>
+                                            </div>
+                                            <span class="fw-bold">{{ number_format($loanStatusDistribution['pending'], 1) }}%</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-circle text-warning me-2" style="font-size: 8px;"></i>
+                                                <span>Overdue</span>
+                                            </div>
+                                            <span class="fw-bold">{{ number_format($loanStatusDistribution['overdue'], 1) }}%</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-circle text-danger me-2" style="font-size: 8px;"></i>
+                                                <span>Closed</span>
+                                            </div>
+                                            <span class="fw-bold">{{ number_format($loanStatusDistribution['closed'], 1) }}%</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-circle text-secondary me-2" style="font-size: 8px;"></i>
+                                                <span>Other</span>
+                                            </div>
+                                            <span class="fw-bold">{{ number_format($loanStatusDistribution['other'], 1) }}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-end text-muted small">
+                                    <span>Updated </span>
+                                    <span class="fw-bold">{{ now()->format('M j, Y') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chart Section -->
+            <div class="col-lg-6  mb-2">
+                <div class="card h-100 mb-2">
+                    <div class="card-body mb-2">
+                      
+                        <div class="chart-container" id="loanDisbursementChart"></div>
+                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Branches & Recent Activity Row -->
+        <div class="row">
+            <!-- Top Performing Branches -->
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h5 class="card-title mb-1">Top Performing Branches</h5>
+                                <p class="text-muted small mb-0">Branches with highest loan portfolio</p>
+                            </div>
+                            <a href="#" class="text-decoration-none">See All</a>
+                        </div>
+                        
+                        <div class="list-group list-group-flush">
+                            @foreach($topBranches as $index => $branch)
+                            <div class="list-group-item px-0 py-3 {{ $index == 0 ? 'top-performer' : '' }}">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-container bg-primary bg-opacity-10 text-primary me-3">
+                                        <i class="fas fa-building"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-bold">{{ $branch->branch_name }}</div>
+                                        <div class="text-muted small">{{ $branch->branch_city }}, {{ $branch->branch_country }}</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fw-bold">${{ number_format($branch->total_portfolio, 2) }}</div>
+                                        <div class="text-muted small">portfolio</div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Loan Applications -->
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div>
+                                <h5 class="card-title mb-1">Recent Loan Applications</h5>
+                                <p class="text-muted small mb-0">Latest loan application requests</p>
+                            </div>
+                            <a href="#" class="text-decoration-none">See All</a>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="border-0 ps-0">No</th>
+                                        <th class="border-0">Application Details</th>
+                                        <th class="border-0 text-center">Status</th>
+                                        <th class="border-0 text-end pe-0">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($recentLoans as $index => $loan)
+                                    <tr>
+                                        <td class="ps-0">{{ $index + 1 }}.</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="icon-container bg-primary bg-opacity-10 text-primary me-3">
+                                                    <i class="fas fa-file-invoice-dollar"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold">{{ $loan->borrower->full_name }}</div>
+                                                    <div class="text-muted small">{{ $loan->loanProduct->loan_product_name ?? 'N/A' }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            @if($loan->loan_status_id == 8)
+                                            <span class="badge bg-warning bg-opacity-20 text-warning">Pending</span>
+                                            @elseif($loan->loan_status_id == 1)
+                                            <span class="badge bg-success bg-opacity-20 text-success">Approved</span>
+                                            @else
+                                            <span class="badge bg-secondary bg-opacity-20 text-secondary">{{ $loan->loanStatus->status_name ?? 'Unknown' }}</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-end pe-0 fw-bold">${{ number_format($loan->loan_principal_amount, 2) }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

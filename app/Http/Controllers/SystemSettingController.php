@@ -7,8 +7,10 @@ use App\Models\RepaymentCycle;
 use App\Models\RepaymentDuration;
 use App\Models\PaymentMethod;
 use App\Models\LoanStatus;
+use App\Models\SystemSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class SystemSettingController extends Controller
 {
@@ -16,12 +18,20 @@ class SystemSettingController extends Controller
     {
         return view('system-settings.index');
     }
-
-    public function update(Request $request)
+    public function system()
     {
-        // General system settings update logic
-        return redirect()->route('system-settings.index')->with('success', 'System settings updated successfully.');
+        $settings = SystemSetting::getSettings();
+        $countries = $this->getCountries();
+        $timezones = $this->getTimezones();
+        $currencies = $this->getCurrencies();
+        return view('system-settings.system', compact('settings', 'countries', 'timezones', 'currencies'));
     }
+
+    // public function update(Request $request)
+    // {
+    //     // General system settings update logic
+    //     return redirect()->route('system-settings.index')->with('success', 'System settings updated successfully.');
+    // }
 
     public function backup()
     {
@@ -233,5 +243,77 @@ class SystemSettingController extends Controller
         $loanStatus->delete();
 
         return redirect()->route('system-settings.loan-statuses')->with('success', 'Loan status deleted successfully.');
+    }
+
+
+    public function update(Request $request)
+    {
+        $validated = $request->validate([
+            'company_name' => 'required|string|max:255',
+            'country' => 'required|string|size:2',
+            'timezone' => 'required|string',
+            'currency' => 'required|string|size:3',
+            'currency_in_words' => 'nullable|string|max:255',
+            'date_format' => 'required|in:dd/mm/yyyy,mm/dd/yyyy,yyyy/mm/dd',
+            'decimal_separator' => 'required|in:dot,comma',
+            'thousand_separator' => 'required|in:comma,dot,space',
+            'monthly_repayment_cycle' => 'required|in:Actual Days in a Month,Same Day Every Month,31,30,28',
+            'yearly_repayment_cycle' => 'required|in:Actual Days in a Year,Same Day Every Year,365,360',
+            'days_in_month_interest' => 'required|in:31,30,28',
+            'days_in_year_interest' => 'required|in:360,365',
+            'business_registration_number' => 'nullable|string|max:100',
+            'address' => 'nullable|string|max:500',
+            'city' => 'nullable|string|max:100',
+            'province' => 'nullable|string|max:100',
+            'zipcode' => 'nullable|string|max:20',
+            'company_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $settings = SystemSetting::getSettings();
+
+        // Handle logo upload
+        if ($request->hasFile('company_logo')) {
+            // Delete old logo if exists
+            if ($settings->company_logo && Storage::exists($settings->company_logo)) {
+                Storage::delete($settings->company_logo);
+            }
+
+            $logoPath = $request->file('company_logo')->store('company-logos', 'public');
+            $validated['company_logo'] = $logoPath;
+        }
+
+        $settings->update($validated);
+
+        return redirect()->route('system')
+            ->with('success', 'System settings updated successfully.');
+    }
+
+    private function getCountries()
+    {
+        return [
+            'AF' => 'Afghanistan',
+            'AL' => 'Albania',
+            'DZ' => 'Algeria',
+            'KE' => 'Kenya',
+            'UG' => 'Uganda',
+            'TZ' => 'Tanzania',
+            'ZW' => 'Zimbabwe',
+        ];
+    }
+
+    private function getTimezones()
+    {
+        return \DateTimeZone::listIdentifiers(\DateTimeZone::ALL);
+    }
+
+    private function getCurrencies()
+    {
+        return [
+            'AED' => 'AED - د.إ',
+            'KES' => 'KES - KSh',
+            'USD' => 'USD - $',
+            'EUR' => 'EUR - €',
+            'GBP' => 'GBP - £',
+        ];
     }
 }
