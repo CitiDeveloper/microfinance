@@ -160,24 +160,24 @@ class CollectionSheetController extends Controller
     public function daily()
     {
         $today = Carbon::today();
-        $branchId = auth()->user()->branch_id; // Assuming user has branch_id
+        $branchId = auth()->user()->branch_id ?? null; // fallback
 
-        // Get due repayments for today
-        $dueRepayments = Loan::where('branch_id', $branchId)
-            ->where('loan_status_id', 'active') // Assuming 'active' status ID
+        $dueRepayments = Loan::when($branchId, fn($q) => $q->where('branch_id', $branchId))
+            ->active() // uses scopeActive() on Loan model
             ->whereHas('repaymentSchedule', function ($query) use ($today) {
-                $query->where('due_date', $today)
+                // Repayment model uses payment_date and status
+                $query->where('payment_date', $today->toDateString())
                     ->where('status', 'pending');
             })
             ->with(['borrower', 'repaymentSchedule' => function ($query) use ($today) {
-                $query->where('due_date', $today)
+                $query->where('payment_date', $today->toDateString())
                     ->where('status', 'pending');
             }])
             ->get();
 
         $summary = [
             'total_expected' => $dueRepayments->sum(function ($loan) {
-                return $loan->repaymentSchedule->sum('due_amount');
+                return $loan->repaymentSchedule->sum('amount'); // repayment.amount
             }),
             'total_borrowers' => $dueRepayments->count(),
         ];
@@ -185,55 +185,56 @@ class CollectionSheetController extends Controller
         return view('collection-sheets.daily', compact('dueRepayments', 'today', 'summary'));
     }
 
+
     /**
      * Display missed repayment sheet
      */
     public function missed()
     {
-        $branchId = auth()->user()->branch_id;
+        $branchId = auth()->user()->branch_id ?? null;
 
-        $missedRepayments = Loan::where('branch_id', $branchId)
-            ->where('loan_status_id', 'active')
+        $missedRepayments = Loan::when($branchId, fn($q) => $q->where('branch_id', $branchId))
+            ->active()
             ->whereHas('repaymentSchedule', function ($query) {
-                $query->where('due_date', '<', Carbon::today())
+                $query->where('payment_date', '<', Carbon::today()->toDateString())
                     ->where('status', 'pending');
             })
             ->with(['borrower', 'repaymentSchedule' => function ($query) {
-                $query->where('due_date', '<', Carbon::today())
+                $query->where('payment_date', '<', Carbon::today()->toDateString())
                     ->where('status', 'pending')
-                    ->orderBy('due_date');
+                    ->orderBy('payment_date');
             }])
             ->get();
 
         $summary = [
             'total_overdue' => $missedRepayments->sum(function ($loan) {
-                return $loan->repaymentSchedule->where('due_date', '<', Carbon::today())->sum('due_amount');
+                return $loan->repaymentSchedule->sum('amount');
             }),
             'total_borrowers' => $missedRepayments->count(),
-            'oldest_overdue' => $missedRepayments->flatMap->repaymentSchedule->min('due_date'),
+            'oldest_overdue' => $missedRepayments->flatMap->repaymentSchedule->min('payment_date'),
         ];
 
         return view('collection-sheets.missed', compact('missedRepayments', 'summary'));
     }
+
 
     /**
      * Display past maturity date loans
      */
     public function pastMaturity()
     {
-        $branchId = auth()->user()->branch_id;
+        $branchId = 1;
 
         $pastMaturityLoans = Loan::where('branch_id', $branchId)
-            ->where('maturity_date', '<', Carbon::today())
-            ->whereIn('loan_status_id', ['active', 'overdue']) // Adjust status IDs as needed
+            ->where('loan_due_date', '<', Carbon::today())
             ->with(['borrower', 'loanProduct'])
-            ->orderBy('maturity_date')
+            ->orderBy('loan_due_date')
             ->get();
 
         $summary = [
             'total_outstanding' => $pastMaturityLoans->sum('outstanding_balance'),
             'total_loans' => $pastMaturityLoans->count(),
-            'oldest_maturity' => $pastMaturityLoans->min('maturity_date'),
+            'oldest_maturity' => $pastMaturityLoans->min('loan_due_date'),
         ];
 
         return view('collection-sheets.past-maturity', compact('pastMaturityLoans', 'summary'));
@@ -252,23 +253,26 @@ class CollectionSheetController extends Controller
         try {
             DB::beginTransaction();
 
-            // Update collection sheet status
+            // recalc total_collected from items (fresh)
+            $collectionSheet->refresh();
+            $totalCollected = $collectionSheet->items()->sum('collected_amount');
+
             $collectionSheet->update([
                 'status' => 'completed',
                 'collection_date' => $validated['collection_date'],
-                'total_collected' => $collectionSheet->items->sum('collected_amount'),
+                'total_collected' => $totalCollected,
             ]);
 
             // Process each collected item
             foreach ($collectionSheet->items as $item) {
                 if ($item->collection_status === 'collected' && $item->repayment_id) {
-                    // Mark repayment as paid
                     $repayment = Repayment::find($item->repayment_id);
                     if ($repayment) {
                         $repayment->update([
-                            'status' => 'paid',
-                            'paid_date' => $validated['collection_date'],
-                            'amount_paid' => $item->collected_amount,
+                            'status' => 'posted', // or 'paid' depending on your system convention
+                            'posted_at' => $validated['collection_date'],
+                            'amount' => $item->collected_amount,
+                            'payment_date' => $validated['collection_date'],
                         ]);
                     }
                 }
@@ -339,14 +343,21 @@ class CollectionSheetController extends Controller
      */
     private function generateCollectionItems(CollectionSheet $collectionSheet)
     {
+        // Only create items if they don't already exist for this sheet+date
+        $existingCount = $collectionSheet->items()->count();
+        if ($existingCount > 0) {
+            return;
+        }
+
         $dueLoans = Loan::where('branch_id', $collectionSheet->branch_id)
-            ->where('loan_status_id', 'active')
+            ->active()
             ->whereHas('repaymentSchedule', function ($query) use ($collectionSheet) {
-                $query->where('due_date', $collectionSheet->collection_date)
+                // use payment_date (Repayment model)
+                $query->where('payment_date', $collectionSheet->collection_date)
                     ->where('status', 'pending');
             })
             ->with(['repaymentSchedule' => function ($query) use ($collectionSheet) {
-                $query->where('due_date', $collectionSheet->collection_date)
+                $query->where('payment_date', $collectionSheet->collection_date)
                     ->where('status', 'pending');
             }])
             ->get();
@@ -357,7 +368,7 @@ class CollectionSheetController extends Controller
                     'collection_sheet_id' => $collectionSheet->id,
                     'loan_id' => $loan->id,
                     'borrower_id' => $loan->borrower_id,
-                    'expected_amount' => $repayment->due_amount,
+                    'expected_amount' => $repayment->amount,      // use amount column
                     'collected_amount' => 0,
                     'collection_status' => 'pending',
                     'collection_date' => $collectionSheet->collection_date,

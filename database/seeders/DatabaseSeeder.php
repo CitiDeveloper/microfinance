@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
             CollateralRegisterSeeder::class,
             RepaymentsTableSeeder::class,
             SystemSettingsSeeder::class,
+            SavingsProductSeeder::class,
         ]);
     }
 }

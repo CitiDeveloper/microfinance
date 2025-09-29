@@ -14,7 +14,7 @@ use App\Http\Controllers\{
     CollectionSheetController,
     GuarantorController,
     SavingController,
-    SavingTransactionController,
+    SavingsTransactionController,
     BankAccountController,
     InvestorController,
     PayrollController,
@@ -137,25 +137,28 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/events/{event}', [CalendarController::class, 'destroyEvent'])->name('calendar.events.destroy');
     });
 
-    // Collection Sheets
-    Route::prefix('collection-sheets')->group(function () {
-        Route::get('/', [CollectionSheetController::class, 'index'])->name('collection-sheets.index');
-        Route::get('/create', [CollectionSheetController::class, 'create'])->name('collection-sheets.create');
-        Route::post('/', [CollectionSheetController::class, 'store'])->name('collection-sheets.store');
-        Route::get('/{collectionSheet}', [CollectionSheetController::class, 'show'])->name('collection-sheets.show');
-        Route::get('/{collectionSheet}/edit', [CollectionSheetController::class, 'edit'])->name('collection-sheets.edit');
-        Route::put('/{collectionSheet}', [CollectionSheetController::class, 'update'])->name('collection-sheets.update');
-        Route::delete('/{collectionSheet}', [CollectionSheetController::class, 'destroy'])->name('collection-sheets.destroy');
+Route::prefix('collection-sheets')->group(function () {
+    Route::get('/', [CollectionSheetController::class, 'index'])->name('collection-sheets.index');
+    Route::get('/create', [CollectionSheetController::class, 'create'])->name('collection-sheets.create');
+    Route::post('/', [CollectionSheetController::class, 'store'])->name('collection-sheets.store');
+    Route::get('/{collectionSheet}', [CollectionSheetController::class, 'show'])->name('collection-sheets.show');
+    Route::get('/{collectionSheet}/edit', [CollectionSheetController::class, 'edit'])->name('collection-sheets.edit');
+    Route::put('/{collectionSheet}', [CollectionSheetController::class, 'update'])->name('collection-sheets.update');
+    Route::delete('/{collectionSheet}', [CollectionSheetController::class, 'destroy'])->name('collection-sheets.destroy');
 
-        // Additional routes for specific types
-        Route::get('/daily', [CollectionSheetController::class, 'daily'])->name('collection-sheets.daily');
-        Route::get('/missed', [CollectionSheetController::class, 'missed'])->name('collection-sheets.missed');
-        Route::get('/past-maturity', [CollectionSheetController::class, 'pastMaturity'])->name('collection-sheets.past-maturity');
+    // Additional routes for specific types
+    Route::get('/daily/collection-sheet', [CollectionSheetController::class, 'daily'])->name('collection-sheets.daily');
+    Route::get('/missedy/collection-sheet', [CollectionSheetController::class, 'missed'])->name('collection-sheets.missed');
+    Route::get('/past-maturityy/collection-sheet', [CollectionSheetController::class, 'pastMaturity'])->name('collection-sheets.past-maturity');
 
-        // Collection actions
-        Route::post('/{collectionSheet}/collect', [CollectionSheetController::class, 'processCollection'])->name('collection-sheets.collect');
-        Route::post('/items/{item}/update-collection', [CollectionSheetController::class, 'updateCollection'])->name('collection-sheets.update-collection');
-    });
+    // Collection actions
+    Route::post('/{collectionSheet}/process-collection', [CollectionSheetController::class, 'processCollection'])->name('collection-sheets.process-collection');
+    Route::post('/items/{item}/update-collection', [CollectionSheetController::class, 'updateCollection'])->name('collection-sheets.update-collection');
+
+    // PDF Export
+    Route::get('/{collectionSheet}/export-pdf', [CollectionSheetController::class, 'exportPdf'])->name('collection-sheets.export-pdf');
+});
+
 
     // Savings
     Route::prefix('savings')->group(function () {
@@ -172,13 +175,15 @@ Route::middleware(['auth'])->group(function () {
 
     // Savings Transactions
     Route::prefix('savings-transactions')->group(function () {
-        Route::get('/', [SavingTransactionController::class, 'index'])->name('savings-transactions.index');
-        Route::get('/create', [SavingTransactionController::class, 'create'])->name('savings-transactions.create');
-        Route::post('/', [SavingTransactionController::class, 'store'])->name('savings-transactions.store');
-        Route::get('/{savingTransaction}', [SavingTransactionController::class, 'show'])->name('savings-transactions.show');
-        Route::get('/{savingTransaction}/edit', [SavingTransactionController::class, 'edit'])->name('savings-transactions.edit');
-        Route::put('/{savingTransaction}', [SavingTransactionController::class, 'update'])->name('savings-transactions.update');
-        Route::delete('/{savingTransaction}', [SavingTransactionController::class, 'destroy'])->name('savings-transactions.destroy');
+        Route::get('/', [SavingsTransactionController::class, 'index'])->name('savings-transactions.index');
+        Route::get('/create', [SavingsTransactionController::class, 'create'])->name('savings-transactions.create');
+        Route::post('/', [SavingsTransactionController::class, 'store'])->name('savings-transactions.store');
+        Route::get('/{savingTransaction}', [SavingsTransactionController::class, 'show'])->name('savings-transactions.show');
+        Route::get('/{savingTransaction}/edit', [SavingsTransactionController::class, 'edit'])->name('savings-transactions.edit');
+        Route::put('/{savingTransaction}', [SavingsTransactionController::class, 'update'])->name('savings-transactions.update');
+        Route::delete('/{savingTransaction}', [SavingsTransactionController::class, 'destroy'])->name('savings-transactions.destroy');
+        // Add print receipt route
+        // Route::get('/print-receipt/{savingTransaction}', [SavingsTransactionController::class, 'printReceipt'])->name('savings-transactions.print-receipt');
     });
 
     // Investors

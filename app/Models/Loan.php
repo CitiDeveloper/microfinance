@@ -66,6 +66,7 @@ class Loan extends Model
 
     protected $casts = [
         'loan_principal_amount' => 'decimal:2',
+        'loan_due_date' => 'date',
         'loan_interest' => 'decimal:4',
         'loan_released_date' => 'date',
         'loan_interest_start_date' => 'date',
@@ -87,7 +88,10 @@ class Loan extends Model
     {
         return $this->belongsTo(LoanProduct::class);
     }
-
+    public function getLoanInterestRateAttribute()
+    {
+        return $this->loan_interest;
+    }
     public function borrower()
     {
         return $this->belongsTo(Borrower::class);

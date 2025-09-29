@@ -91,7 +91,7 @@
                                 </div>
                                 <div class="col-6 mb-3">
                                     <label class="font-weight-bold text-muted small">Interest Rate</label>
-                                    <p class="h5 text-success mb-0">{{ $loan->loan_interest }}%</p>
+                               <p class="h5 text-success mb-0">{{ number_format($loan->loan_interest, 2) }}%</p>
                                 </div>
                                 <div class="col-6 mb-3">
                                     <label class="font-weight-bold text-muted small">Duration</label>
@@ -473,7 +473,7 @@
                     </h6>
                 </div>
                 <div class="card-body">
-                    <div class="d-grid gap-2">
+                    
                         <button class="btn btn-outline-success btn-sm">
                             <i class="fas fa-cash-register mr-1"></i>Record Payment
                         </button>
@@ -489,7 +489,7 @@
                         <button class="btn btn-outline-secondary btn-sm">
                             <i class="fas fa-print mr-1"></i>Print Schedule
                         </button>
-                    </div>
+                   
                 </div>
             </div>
         </div>
