@@ -8,7 +8,7 @@
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Transaction Details</h1>
         <div>
-          
+           <a href="{{ route('savings-transactions.print-receipt', $savingsTransaction) }}"><i class="fas fa-print fa-sm text-gray-50"></i> Print Receipt</a>
 
             <a href="{{ route('savings-transactions.edit', $savingsTransaction) }}" 
                class="btn btn-primary shadow-sm">
