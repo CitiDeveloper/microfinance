@@ -415,7 +415,7 @@
                     <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
                         <i class="fas fa-user text-white fa-2x"></i>
                     </div>
-                    <h6 class="font-weight-bold mb-1">{{ $loan->borrower->name }}</h6>
+                    <h6 class="font-weight-bold mb-1">{{ $loan->borrower->full_name }}</h6>
                     <p class="text-muted small mb-3">Member since {{ $loan->loan_released_date->subMonths(6)->format('M Y') }}</p>
                     
                     <div class="d-grid gap-2 mb-3">

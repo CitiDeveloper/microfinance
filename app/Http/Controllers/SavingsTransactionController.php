@@ -151,7 +151,7 @@ class SavingsTransactionController extends Controller
     public function show(SavingsTransaction $savingsTransaction)
     {
         $savingsTransaction->load(['account.borrower', 'branch', 'creator']);
-
+        //dd($savingsTransaction);    
         return view('savings-transactions.show', compact('savingsTransaction'));
     }
 
@@ -224,9 +224,9 @@ class SavingsTransactionController extends Controller
     /**
      * Print transaction receipt
      */
-    public function printReceipt(SavingsTransaction $savingTransaction)
+    public function printReceipt(SavingsTransaction $savingsTransaction)
     {
-        $savingTransaction->load(['account.borrower', 'branch', 'creator']);
+        $savingsTransaction->load(['account.borrower', 'branch', 'creator']);
 
         return view('savings-transactions.receipt', compact('savingsTransaction'));
     }

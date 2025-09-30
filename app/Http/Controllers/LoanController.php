@@ -13,6 +13,7 @@ use App\Models\LoanStatus;
 use App\Models\BankAccount;
 use App\Models\Guarantor;
 use App\Models\LoanPaymentScheme;
+use App\Models\SystemSetting;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -78,6 +79,12 @@ class LoanController extends Controller
         ]);
 
         DB::transaction(function () use ($validated, $request) {
+            $settings = SystemSetting::getSettings();
+
+            
+            if (empty($validated['loan_application_id'])) {
+                $validated['loan_application_id'] = $settings->generateLoanId();
+            }
             $loan = Loan::create($validated);
 
             // Sync guarantors if provided

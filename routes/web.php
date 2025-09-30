@@ -109,13 +109,14 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [RepaymentController::class, 'index'])->name('repayments.index');
         Route::get('/due', [RepaymentController::class, 'due'])->name('repayments.due');
         Route::get('/create', [RepaymentController::class, 'create'])->name('repayments.create');
-        Route::post('/', [RepaymentController::class, 'store'])->name('repayments.store');
-        Route::get('/{repayment}', [RepaymentController::class, 'show'])->name('repayments.show');
-        Route::get('/{repayment}/edit', [RepaymentController::class, 'edit'])->name('repayments.edit');
+        Route::post('/', [RepaymentController::class, 'store'])->name('repayments.store');       
         Route::put('/{repayment}', [RepaymentController::class, 'update'])->name('repayments.update');
         Route::delete('/{repayment}', [RepaymentController::class, 'destroy'])->name('repayments.destroy');
+        Route::get('/{repayment}/edit', [RepaymentController::class, 'edit'])->name('repayments.edit');
+        Route::get('/{repayment}', [RepaymentController::class, 'show'])->name('repayments.show');
         Route::post('/bulk', [RepaymentController::class, 'bulkStore'])->name('repayments.bulk');
     });
+
 
     // Collateral Register
     Route::prefix('collateral')->group(function () {
@@ -174,17 +175,22 @@ Route::prefix('collection-sheets')->group(function () {
     });
 
     // Savings Transactions
+ 
     Route::prefix('savings-transactions')->group(function () {
         Route::get('/', [SavingsTransactionController::class, 'index'])->name('savings-transactions.index');
         Route::get('/create', [SavingsTransactionController::class, 'create'])->name('savings-transactions.create');
         Route::post('/', [SavingsTransactionController::class, 'store'])->name('savings-transactions.store');
-        Route::get('/{savingTransaction}', [SavingsTransactionController::class, 'show'])->name('savings-transactions.show');
-        Route::get('/{savingTransaction}/edit', [SavingsTransactionController::class, 'edit'])->name('savings-transactions.edit');
-        Route::put('/{savingTransaction}', [SavingsTransactionController::class, 'update'])->name('savings-transactions.update');
-        Route::delete('/{savingTransaction}', [SavingsTransactionController::class, 'destroy'])->name('savings-transactions.destroy');
-        // Add print receipt route
-        // Route::get('/print-receipt/{savingTransaction}', [SavingsTransactionController::class, 'printReceipt'])->name('savings-transactions.print-receipt');
+
+        
+        Route::get('/print-receipt/{savingsTransaction}', [SavingsTransactionController::class, 'printReceipt'])
+            ->name('savings-transactions.print-receipt');
+
+        Route::get('/{savingsTransaction}', [SavingsTransactionController::class, 'show'])->name('savings-transactions.show');
+        Route::get('/{savingsTransaction}/edit', [SavingsTransactionController::class, 'edit'])->name('savings-transactions.edit');
+        Route::put('/{savingsTransaction}', [SavingsTransactionController::class, 'update'])->name('savings-transactions.update');
+        Route::delete('/{savingsTransaction}', [SavingsTransactionController::class, 'destroy'])->name('savings-transactions.destroy');
     });
+
 
     // Investors
     Route::prefix('investors')->group(function () {
@@ -258,19 +264,64 @@ Route::prefix('collection-sheets')->group(function () {
     Route::resource('guarantors', GuarantorController::class);
     // Accounting
     Route::prefix('accounting')->group(function () {
+        // Main Accounting Routes
         Route::get('/chart-of-accounts', [AccountingController::class, 'chartOfAccounts'])->name('accounting.chart-of-accounts');
         Route::get('/journal-entries', [AccountingController::class, 'journalEntries'])->name('accounting.journal-entries');
         Route::get('/trial-balance', [AccountingController::class, 'trialBalance'])->name('accounting.trial-balance');
         Route::get('/balance-sheet', [AccountingController::class, 'balanceSheet'])->name('accounting.balance-sheet');
         Route::get('/income-statement', [AccountingController::class, 'incomeStatement'])->name('accounting.income-statement');
 
-        // Journal Entries CRUD
-        Route::post('/journal-entries', [AccountingController::class, 'storeJournalEntry'])->name('accounting.journal-entries.store');
-        Route::get('/journal-entries/{journalEntry}', [AccountingController::class, 'showJournalEntry'])->name('accounting.journal-entries.show');
-        Route::put('/journal-entries/{journalEntry}', [AccountingController::class, 'updateJournalEntry'])->name('accounting.journal-entries.update');
-        Route::delete('/journal-entries/{journalEntry}', [AccountingController::class, 'destroyJournalEntry'])->name('accounting.journal-entries.destroy');
-    });
+        // Chart of Accounts CRUD
+        Route::prefix('chart-of-accounts')->group(function () {
+            Route::post('/', [AccountingController::class, 'storeChartOfAccount'])->name('accounting.chart-of-accounts.store');
+            Route::get('/create', [AccountingController::class, 'createChartOfAccount'])->name('accounting.chart-of-accounts.create');
+            Route::get('/{chartOfAccount}', [AccountingController::class, 'showChartOfAccount'])->name('accounting.chart-of-accounts.show');
+            Route::get('/{chartOfAccount}/edit', [AccountingController::class, 'editChartOfAccount'])->name('accounting.chart-of-accounts.edit');
+            Route::put('/{chartOfAccount}', [AccountingController::class, 'updateChartOfAccount'])->name('accounting.chart-of-accounts.update');
+            Route::delete('/{chartOfAccount}', [AccountingController::class, 'destroyChartOfAccount'])->name('accounting.chart-of-accounts.destroy');
+            Route::patch('/{chartOfAccount}/toggle-status', [AccountingController::class, 'toggleChartOfAccountStatus'])->name('accounting.chart-of-accounts.toggle-status');
+        });
 
+        // Journal Entries CRUD
+        Route::prefix('journal-entries')->group(function () {
+            Route::get('/create', [AccountingController::class, 'createJournalEntry'])->name('accounting.journal-entries.create');
+            Route::post('/', [AccountingController::class, 'storeJournalEntry'])->name('accounting.journal-entries.store');
+            Route::get('/{journalEntry}', [AccountingController::class, 'showJournalEntry'])->name('accounting.journal-entries.show');
+            Route::get('/{journalEntry}/edit', [AccountingController::class, 'editJournalEntry'])->name('accounting.journal-entries.edit');
+            Route::put('/{journalEntry}', [AccountingController::class, 'updateJournalEntry'])->name('accounting.journal-entries.update');
+            Route::delete('/{journalEntry}', [AccountingController::class, 'destroyJournalEntry'])->name('accounting.journal-entries.destroy');
+            Route::post('/{journalEntry}/post', [AccountingController::class, 'postJournalEntry'])->name('accounting.journal-entries.post');
+            Route::post('/{journalEntry}/cancel', [AccountingController::class, 'cancelJournalEntry'])->name('accounting.journal-entries.cancel');
+        });
+
+        // Account Types Management
+        Route::prefix('account-types')->group(function () {
+            Route::get('/', [AccountingController::class, 'accountTypes'])->name('accounting.account-types.index');
+            Route::post('/', [AccountingController::class, 'storeAccountType'])->name('accounting.account-types.store');
+            Route::get('/create', [AccountingController::class, 'createAccountType'])->name('accounting.account-types.create');
+            Route::get('/{accountType}', [AccountingController::class, 'showAccountType'])->name('accounting.account-types.show');
+            Route::get('/{accountType}/edit', [AccountingController::class, 'editAccountType'])->name('accounting.account-types.edit');
+            Route::put('/{accountType}', [AccountingController::class, 'updateAccountType'])->name('accounting.account-types.update');
+            Route::delete('/{accountType}', [AccountingController::class, 'destroyAccountType'])->name('accounting.account-types.destroy');
+        });
+
+        // Reports and Analytics
+        Route::prefix('reports')->group(function () {
+            Route::get('/general-ledger', [AccountingController::class, 'generalLedger'])->name('accounting.reports.general-ledger');
+            Route::get('/cash-flow', [AccountingController::class, 'cashFlow'])->name('accounting.reports.cash-flow');
+            Route::get('/account-statement/{account}', [AccountingController::class, 'accountStatement'])->name('accounting.reports.account-statement');
+            Route::post('/export-trial-balance', [AccountingController::class, 'exportTrialBalance'])->name('accounting.reports.export-trial-balance');
+            Route::post('/export-balance-sheet', [AccountingController::class, 'exportBalanceSheet'])->name('accounting.reports.export-balance-sheet');
+            Route::post('/export-income-statement', [AccountingController::class, 'exportIncomeStatement'])->name('accounting.reports.export-income-statement');
+        });
+
+        // API Routes for Data
+        Route::prefix('api')->group(function () {
+            Route::get('/chart-of-accounts', [AccountingController::class, 'getChartOfAccounts'])->name('accounting.api.chart-of-accounts');
+            Route::get('/account-balance/{account}', [AccountingController::class, 'getAccountBalance'])->name('accounting.api.account-balance');
+            Route::get('/journal-entries-data', [AccountingController::class, 'getJournalEntriesData'])->name('accounting.api.journal-entries-data');
+        });
+    });
     // System Settings
     Route::prefix('system-settings')->group(function () {
         Route::get('/', [SystemSettingController::class, 'index'])->name('system-settings.index');

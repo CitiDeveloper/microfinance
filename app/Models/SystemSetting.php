@@ -103,4 +103,17 @@ class SystemSetting extends Model
                 return $date->format('d/m/Y');
         }
     }
+
+    public function generateLoanId()
+    {
+        
+        $prefix = $this->loan_id_prefix ?? 'LN-';
+        $sequence = $this->loan_id_sequence ?? 1;
+        $padding = $this->loan_id_padding ?? 5;
+        $loanId = $prefix . str_pad($sequence, $padding, '0', STR_PAD_LEFT);       
+        $this->loan_id_sequence = $sequence + 1;
+        $this->save();
+
+        return $loanId;
+    }
 }

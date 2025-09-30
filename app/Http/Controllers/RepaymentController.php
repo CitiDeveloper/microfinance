@@ -69,14 +69,16 @@ class RepaymentController extends Controller
      */
     public function create()
     {
-        $loans = Loan::with('borrower')->where('status', 'active')->get();
+        $loans = Loan::with('borrower')->get();
         $branches = Branch::all();
         $staff = Staff::all();
         $paymentMethods = PaymentMethod::all();
         $bankAccounts = BankAccount::all();
+        $repayment = new Repayment(); 
 
-        return view('repayments.create', compact('loans', 'branches', 'staff', 'paymentMethods', 'bankAccounts'));
+        return view('repayments.create', compact('loans', 'branches', 'staff', 'paymentMethods', 'bankAccounts', 'repayment'));
     }
+
 
     /**
      * Store a newly created resource in storage.

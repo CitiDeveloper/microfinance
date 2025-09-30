@@ -331,40 +331,64 @@
                 </div>
             </div>
 
-            <div class="menu-item has-sub">
-                <a href="#" class="menu-link">
-                    <span class="menu-icon"><i class="fa fa-balance-scale"></i></span>
-                    <span class="menu-text">Accounting</span>
-                    <span class="menu-caret"><b class="caret"></b></span>
-                </a>
-                <div class="menu-submenu">
-                    <div class="menu-item">
-                        <a href="{{ route('accounting.chart-of-accounts') }}" class="menu-link">
-                            <span class="menu-text">Chart of Accounts</span>
-                        </a>
-                    </div>
-                    <div class="menu-item">
-                        <a href="{{ route('accounting.journal-entries') }}" class="menu-link">
-                            <span class="menu-text">Journal Entries</span>
-                        </a>
-                    </div>
-                    <div class="menu-item">
-                        <a href="{{ route('accounting.trial-balance') }}" class="menu-link">
-                            <span class="menu-text">Trial Balance</span>
-                        </a>
-                    </div>
-                    <div class="menu-item">
-                        <a href="{{ route('accounting.balance-sheet') }}" class="menu-link">
-                            <span class="menu-text">Balance Sheet</span>
-                        </a>
-                    </div>
-                    <div class="menu-item">
-                        <a href="{{ route('accounting.income-statement') }}" class="menu-link">
-                            <span class="menu-text">Income Statement</span>
-                        </a>
-                    </div>
+            {{-- Updated Accounting Menu --}}
+<div class="menu-item has-sub">
+    <a href="#" class="menu-link">
+        <span class="menu-icon"><i class="fa fa-balance-scale"></i></span>
+        <span class="menu-text">Accounting</span>
+        <span class="menu-caret"><b class="caret"></b></span>
+    </a>
+    <div class="menu-submenu">
+        <div class="menu-item">
+            <a href="{{ route('accounting.chart-of-accounts') }}" class="menu-link">
+                <span class="menu-text">Chart of Accounts</span>
+            </a>
+        </div>
+        <div class="menu-item">
+            <a href="{{ route('accounting.account-types.index') }}" class="menu-link">
+                <span class="menu-text">Account Types</span>
+            </a>
+        </div>
+        <div class="menu-item">
+            <a href="{{ route('accounting.journal-entries') }}" class="menu-link">
+                <span class="menu-text">Journal Entries</span>
+            </a>
+        </div>
+        <div class="menu-item has-sub">
+            <a href="#" class="menu-link">
+                <span class="menu-text">Financial Reports</span>
+                <span class="menu-caret"><b class="caret"></b></span>
+            </a>
+            <div class="menu-submenu">
+                <div class="menu-item">
+                    <a href="{{ route('accounting.trial-balance') }}" class="menu-link">
+                        <span class="menu-text">Trial Balance</span>
+                    </a>
+                </div>
+                <div class="menu-item">
+                    <a href="{{ route('accounting.balance-sheet') }}" class="menu-link">
+                        <span class="menu-text">Balance Sheet</span>
+                    </a>
+                </div>
+                <div class="menu-item">
+                    <a href="{{ route('accounting.income-statement') }}" class="menu-link">
+                        <span class="menu-text">Income Statement</span>
+                    </a>
+                </div>
+                <div class="menu-item">
+                    <a href="{{ route('accounting.reports.general-ledger') }}" class="menu-link">
+                        <span class="menu-text">General Ledger</span>
+                    </a>
+                </div>
+                <div class="menu-item">
+                    <a href="{{ route('accounting.reports.cash-flow') }}" class="menu-link">
+                        <span class="menu-text">Cash Flow</span>
+                    </a>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
 
             <!-- System -->
             <div class="menu-header">System</div>

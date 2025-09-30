@@ -21,11 +21,25 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="loan_product_id" class="form-label">Loan Product *</label>
                                     <select name="loan_product_id" id="loan_product_id"
-                                        class="form-control @error('loan_product_id') is-invalid @enderror" required>
+                                        class="form-control @error('loan_product_id') is-invalid @enderror" required
+                                        onchange="updateLoanProductDefaults()">
                                         <option value="">-- Select Loan Product --</option>
                                         @foreach ($loanProducts as $product)
                                             <option value="{{ $product->id }}"
-                                                {{ old('loan_product_id') == $product->id ? 'selected' : '' }}>
+                                                {{ old('loan_product_id') == $product->id ? 'selected' : '' }}
+                                                data-defaults="{{ json_encode([
+                                                    'default_loan_principal_amount' => $product->default_loan_principal_amount,
+                                                    'loan_interest_method' => $product->loan_interest_method,
+                                                    'loan_interest_type' => $product->loan_interest_type,
+                                                    'default_loan_interest' => $product->default_loan_interest,
+                                                    'loan_interest_period' => $product->loan_interest_period,
+                                                    'loan_duration_period' => $product->loan_duration_period,
+                                                    'default_loan_duration' => $product->default_loan_duration,
+                                                    'loan_payment_scheme_id' => $product->loan_payment_scheme_id,
+                                                    'default_loan_num_of_repayments' => $product->default_loan_num_of_repayments,
+                                                    'dea_cash_bank_account' => $product->dea_cash_bank_account,
+                                                    'loan_disbursed_by_id' => $product->loan_disbursed_by_id,
+                                                ]) }}">
                                                 {{ $product->loan_product_name }}
                                             </option>
                                         @endforeach
@@ -54,14 +68,16 @@
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="loan_application_id" class="form-label">Application ID *</label>
-                                    <input type="text" name="loan_application_id" id="loan_application_id"
-                                        class="form-control @error('loan_application_id') is-invalid @enderror"
-                                        value="{{ old('loan_application_id') }}" required>
-                                    @error('loan_application_id')
-                                        <span class="invalid-feedback">{{ $message }}</span>
-                                    @enderror
-                                </div>
+    <label for="loan_application_id" class="form-label">Application ID</label>
+    <input type="text" name="loan_application_id" id="loan_application_id"
+        class="form-control @error('loan_application_id') is-invalid @enderror"
+        value="{{ old('loan_application_id', \App\Models\SystemSetting::getSettings()->generateLoanId()) }}">
+    <small class="text-muted">Leave as is to auto-generate, or override if needed.</small>
+    @error('loan_application_id')
+        <span class="invalid-feedback">{{ $message }}</span>
+    @enderror
+</div>
+
                                 <div class="col-md-6 mb-3">
                                     <label for="branch_id" class="form-label">Branch *</label>
                                     <select name="branch_id" id="branch_id"
@@ -116,7 +132,7 @@
                                     <label for="loan_released_date" class="form-label">Release Date *</label>
                                     <input type="date" name="loan_released_date" id="loan_released_date"
                                         class="form-control @error('loan_released_date') is-invalid @enderror"
-                                        value="{{ old('loan_released_date') }}" required>
+                                        value="{{ old('loan_released_date', date('Y-m-d')) }}" required>
                                     @error('loan_released_date')
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror
@@ -258,7 +274,7 @@
                                         <label for="grace_period_repayments">Grace Period (Installments)</label>
                                         <input type="number" name="grace_period_repayments" id="grace_period_repayments"
                                             class="form-control"
-                                            value="{{ old('grace_period_repayments', $loan->grace_period_repayments ?? 0) }}"
+                                            value="{{ old('grace_period_repayments', 0) }}"
                                             min="0">
                                         <small class="text-muted">Number of installments where only interest is
                                             paid</small>
@@ -350,8 +366,6 @@
                                 </div>
                             </div>
 
-                            <!-- Additional sections could go here (after-maturity, auto payments, etc.) -->
-
                         </div>
                         <div class="card-footer text-end">
                             <button type="submit" class="btn btn-success">Create Loan</button>
@@ -362,4 +376,94 @@
             </div>
         </div>
     </div>
+    <script>
+function updateLoanProductDefaults() {
+    const loanProductSelect = document.getElementById('loan_product_id');
+    const selectedOption = loanProductSelect.options[loanProductSelect.selectedIndex];
+    
+    if (selectedOption.value && selectedOption.dataset.defaults) {
+        const defaults = JSON.parse(selectedOption.dataset.defaults);
+        
+        // Update Principal Amount
+        if (defaults.default_loan_principal_amount) {
+            document.getElementById('loan_principal_amount').value = defaults.default_loan_principal_amount;
+        }
+        
+        // Update Interest Method
+        if (defaults.loan_interest_method) {
+            document.getElementById('loan_interest_method').value = defaults.loan_interest_method;
+        }
+        
+        // Update Interest Type (radio buttons)
+        if (defaults.loan_interest_type) {
+            if (defaults.loan_interest_type === 'percentage') {
+                document.getElementById('interest_type_percentage').checked = true;
+            } else if (defaults.loan_interest_type === 'fixed') {
+                document.getElementById('interest_type_fixed').checked = true;
+            }
+        }
+        
+        // Update Loan Interest
+        if (defaults.default_loan_interest) {
+            document.getElementById('loan_interest').value = defaults.default_loan_interest;
+        }
+        
+        // Update Interest Period
+        if (defaults.loan_interest_period) {
+            document.getElementById('loan_interest_period').value = defaults.loan_interest_period;
+        }
+        
+        // Update Duration Period
+        if (defaults.loan_duration_period) {
+            document.getElementById('loan_duration_period').value = defaults.loan_duration_period;
+        }
+        
+        // Update Loan Duration
+        if (defaults.default_loan_duration) {
+            document.getElementById('loan_duration').value = defaults.default_loan_duration;
+        }
+        
+        // Update Repayment Cycle
+        if (defaults.loan_payment_scheme_id) {
+            // Handle array case (multiple payment schemes)
+            const paymentSchemeId = Array.isArray(defaults.loan_payment_scheme_id) 
+                ? defaults.loan_payment_scheme_id[0] 
+                : defaults.loan_payment_scheme_id;
+            document.getElementById('loan_payment_scheme_id').value = paymentSchemeId;
+        }
+        
+        // Update Number of Repayments
+        if (defaults.default_loan_num_of_repayments) {
+            document.getElementById('loan_num_of_repayments').value = defaults.default_loan_num_of_repayments;
+        }
+        
+        // Update Bank Account
+        if (defaults.dea_cash_bank_account) {
+            // Handle array case
+            const bankAccountId = Array.isArray(defaults.dea_cash_bank_account) 
+                ? defaults.dea_cash_bank_account[0] 
+                : defaults.dea_cash_bank_account;
+            document.getElementById('dea_cash_bank_account').value = bankAccountId;
+        }
+        
+        // Update Disbursement Method
+        if (defaults.loan_disbursed_by_id) {
+            // Handle array case
+            const disbursedById = Array.isArray(defaults.loan_disbursed_by_id) 
+                ? defaults.loan_disbursed_by_id[0] 
+                : defaults.loan_disbursed_by_id;
+            document.getElementById('loan_disbursed_by_id').value = disbursedById;
+        }
+    }
+}
+
+// Initialize defaults when page loads if a loan product is already selected
+document.addEventListener('DOMContentLoaded', function() {
+    const loanProductSelect = document.getElementById('loan_product_id');
+    if (loanProductSelect.value) {
+        updateLoanProductDefaults();
+    }
+});
+</script>
 @endsection
+
