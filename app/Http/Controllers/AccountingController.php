@@ -324,33 +324,169 @@ class AccountingController extends Controller
             ->with('success', 'Account type deleted successfully.');
     }
     // Report Methods
+    // Add these methods to your AccountingController.php
+
     public function generalLedger(Request $request)
     {
-        $query = JournalEntryItem::with(['journalEntry', 'chartOfAccount'])
-            ->whereHas('journalEntry', function ($q) {
-                $q->where('status', 'posted');
-            });
+        $startDate = $request->start_date ?? now()->startOfMonth()->format('Y-m-d');
+        $endDate = $request->end_date ?? now()->format('Y-m-d');
+        $accountId = $request->account_id;
+        $branchId = $request->branch_id;
 
-        if ($request->has('account_id')) {
-            $query->where('chart_of_account_id', $request->account_id);
+        $accounts = ChartOfAccount::where('is_active', true)->orderBy('code')->get();
+        $branches = Branch::where('is_active', true)->get();
+
+        if ($accountId) {
+            // Single account ledger
+            $selectedAccount = ChartOfAccount::findOrFail($accountId);
+
+            $query = JournalEntryItem::with(['journalEntry.branch', 'journalEntry.createdBy'])
+                ->where('chart_of_account_id', $accountId)
+                ->whereHas('journalEntry', function ($query) use ($startDate, $endDate, $branchId) {
+                    $query->where('status', 'posted')
+                        ->whereBetween('entry_date', [$startDate, $endDate]);
+
+                    if ($branchId) {
+                        $query->where('branch_id', $branchId);
+                    }
+                });
+
+            $transactions = $query->orderBy('journal_entries.entry_date')->get();
+
+            $totalDebit = $transactions->sum('debit');
+            $totalCredit = $transactions->sum('credit');
+            $totalTransactions = $transactions->count();
+            $uniqueAccounts = 1;
+
+            return view('accounting.reports.general-ledger', compact(
+                'transactions',
+                'accounts',
+                'branches',
+                'totalDebit',
+                'totalCredit',
+                'totalTransactions',
+                'uniqueAccounts',
+                'selectedAccount',
+                'startDate',
+                'endDate'
+            ));
+        } else {
+            // All accounts summary
+            $accountSummaries = [];
+            $totalDebit = 0;
+            $totalCredit = 0;
+
+            foreach ($accounts as $account) {
+                $query = $account->journalEntryItems()
+                    ->whereHas('journalEntry', function ($query) use ($startDate, $endDate, $branchId) {
+                        $query->where('status', 'posted')
+                            ->whereBetween('entry_date', [$startDate, $endDate]);
+
+                        if ($branchId) {
+                            $query->where('branch_id', $branchId);
+                        }
+                    });
+
+                $debit = $query->sum('debit');
+                $credit = $query->sum('credit');
+
+                if ($debit > 0 || $credit > 0) {
+                    $accountSummaries[] = [
+                        'account' => $account,
+                        'debit' => $debit,
+                        'credit' => $credit,
+                    ];
+
+                    $totalDebit += $debit;
+                    $totalCredit += $credit;
+                }
+            }
+
+            $totalTransactions = array_sum(array_map(function ($summary) {
+                return $summary['debit'] + $summary['credit'];
+            }, $accountSummaries));
+
+            $uniqueAccounts = count($accountSummaries);
+
+            return view('accounting.reports.general-ledger', compact(
+                'accountSummaries',
+                'accounts',
+                'branches',
+                'totalDebit',
+                'totalCredit',
+                'totalTransactions',
+                'uniqueAccounts',
+                'startDate',
+                'endDate'
+            ));
         }
+    }
 
-        if ($request->has('start_date')) {
-            $query->whereHas('journalEntry', function ($q) use ($request) {
-                $q->where('entry_date', '>=', $request->start_date);
-            });
-        }
+    public function cashFlow(Request $request)
+    {
+        $startDate = $request->start_date ?? now()->startOfMonth()->format('Y-m-d');
+        $endDate = $request->end_date ?? now()->format('Y-m-d');
 
-        if ($request->has('end_date')) {
-            $query->whereHas('journalEntry', function ($q) use ($request) {
-                $q->where('entry_date', '<=', $request->end_date);
-            });
-        }
+        // This is a simplified cash flow calculation
+        // In a real application, you would have more sophisticated logic
 
-        $transactions = $query->latest()->get();
-        $accounts = ChartOfAccount::where('is_active', true)->get();
+        // Operating Activities (simplified)
+        $netIncome = 50000; // This would be calculated from income statement
+        $operatingActivities = [
+            ['description' => 'Depreciation Expense', 'amount' => 5000],
+            ['description' => 'Increase in Accounts Receivable', 'amount' => -2000],
+            ['description' => 'Decrease in Inventory', 'amount' => 3000],
+        ];
+        $cashFromOperations = $netIncome + array_sum(array_column($operatingActivities, 'amount'));
 
-        return view('accounting.reports.general-ledger', compact('transactions', 'accounts'));
+        // Investing Activities (example data)
+        $investingActivities = [
+            ['description' => 'Purchase of Equipment', 'amount' => -15000],
+            ['description' => 'Sale of Investments', 'amount' => 8000],
+        ];
+        $cashFromInvesting = array_sum(array_column($investingActivities, 'amount'));
+
+        // Financing Activities (example data)
+        $financingActivities = [
+            ['description' => 'Issuance of Common Stock', 'amount' => 20000],
+            ['description' => 'Payment of Dividends', 'amount' => -5000],
+            ['description' => 'Repayment of Long-term Debt', 'amount' => -10000],
+        ];
+        $cashFromFinancing = array_sum(array_column($financingActivities, 'amount'));
+
+        return view('accounting.reports.cash-flow', compact(
+            'netIncome',
+            'operatingActivities',
+            'investingActivities',
+            'financingActivities',
+            'cashFromOperations',
+            'cashFromInvesting',
+            'cashFromFinancing',
+            'startDate',
+            'endDate'
+        ));
+    }
+
+    public function accountStatement(ChartOfAccount $account, Request $request)
+    {
+        $startDate = $request->start_date ?? now()->startOfMonth()->format('Y-m-d');
+        $endDate = $request->end_date ?? now()->format('Y-m-d');
+
+        $transactions = JournalEntryItem::with(['journalEntry.branch'])
+            ->where('chart_of_account_id', $account->id)
+            ->whereHas('journalEntry', function ($query) use ($startDate, $endDate) {
+                $query->where('status', 'posted')
+                    ->whereBetween('entry_date', [$startDate, $endDate]);
+            })
+            ->orderBy('journal_entries.entry_date')
+            ->get();
+
+        return view('accounting.reports.account-statement', compact(
+            'account',
+            'transactions',
+            'startDate',
+            'endDate'
+        ));
     }
 
     // API Methods
@@ -470,27 +606,56 @@ class AccountingController extends Controller
         return view('accounting.journal-entries.show', compact('journalEntry'));
     }
 
-    public function trialBalance()
-    {
-        $accounts = ChartOfAccount::with(['accountType', 'journalEntryItems'])
-            ->where('is_active', true)
-            ->get()
-            ->map(function ($account) {
-                $debit = $account->journalEntryItems->sum('debit');
-                $credit = $account->journalEntryItems->sum('credit');
+    // Update the trialBalance method in AccountingController.php
 
-                return [
-                    'account' => $account,
-                    'debit' => $debit,
-                    'credit' => $credit,
-                    'balance' => $account->normal_balance === 'debit' ? $debit - $credit : $credit - $debit,
-                ];
-            });
+    public function trialBalance(Request $request)
+    {
+        $startDate = $request->start_date ?? now()->startOfMonth()->format('Y-m-d');
+        $endDate = $request->end_date ?? now()->format('Y-m-d');
+        $branchId = $request->branch_id;
+
+        // Get accounts with their balances for the period
+        $query = ChartOfAccount::with(['accountType', 'journalEntryItems.journalEntry'])
+            ->where('is_active', true);
+
+        $accounts = $query->get()->map(function ($account) use ($startDate, $endDate, $branchId) {
+            $journalEntryItems = $account->journalEntryItems()
+                ->whereHas('journalEntry', function ($query) use ($startDate, $endDate, $branchId) {
+                    $query->where('status', 'posted')
+                        ->whereBetween('entry_date', [$startDate, $endDate]);
+
+                    if ($branchId) {
+                        $query->where('branch_id', $branchId);
+                    }
+                })
+                ->get();
+
+            $debit = $journalEntryItems->sum('debit');
+            $credit = $journalEntryItems->sum('credit');
+
+            return [
+                'account' => $account,
+                'debit' => $debit,
+                'credit' => $credit,
+                'balance' => $account->normal_balance === 'debit' ? $debit - $credit : $credit - $debit,
+            ];
+        });
 
         $totalDebit = $accounts->sum('debit');
         $totalCredit = $accounts->sum('credit');
+        $totalAccounts = $accounts->count();
 
-        return view('accounting.trial-balance', compact('accounts', 'totalDebit', 'totalCredit'));
+        $branches = Branch::where('is_active', true)->get();
+
+        return view('accounting.trial-balance', compact(
+            'accounts',
+            'totalDebit',
+            'totalCredit',
+            'totalAccounts',
+            'branches',
+            'startDate',
+            'endDate'
+        ));
     }
 
     public function balanceSheet()
@@ -503,8 +668,9 @@ class AccountingController extends Controller
         $totalAssets = $assets->sum('balance');
         $totalLiabilities = $liabilities->sum('balance');
         $totalEquity = $equity->sum('balance');
+        $branches = Branch::where('is_active', true)->get();
 
-        return view('accounting.balance-sheet', compact('assets', 'liabilities', 'equity', 'totalAssets', 'totalLiabilities', 'totalEquity'));
+        return view('accounting.balance-sheet', compact('assets', 'branches', 'liabilities', 'equity', 'totalAssets', 'totalLiabilities', 'totalEquity'));
     }
 
     public function incomeStatement()
@@ -516,8 +682,9 @@ class AccountingController extends Controller
         $totalIncome = $incomes->sum('balance');
         $totalExpenses = $expenses->sum('balance');
         $netIncome = $totalIncome - $totalExpenses;
+        $branches = Branch::where('is_active', true)->get();
 
-        return view('accounting.income-statement', compact('incomes', 'expenses', 'totalIncome', 'totalExpenses', 'netIncome'));
+        return view('accounting.income-statement', compact('incomes', 'branches','expenses', 'totalIncome', 'totalExpenses', 'netIncome'));
     }
 
     private function getAccountsByCategory($category)

@@ -295,7 +295,7 @@
 
 
             <!-- Reports & Accounting -->
-            <div class="menu-header">Reports & Accounting</div>
+            <div class="menu-header">Reports</div>
             <div class="menu-item has-sub">
                 <a href="#" class="menu-link">
                     <span class="menu-icon"><i class="fa fa-chart-bar"></i></span>
